@@ -108,7 +108,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
         }
 
-        /* כפתור יצירת לינק (חדש - ירוק כהה) */
+        /* כפתור הורדת HTML (עדכון סגנון לירוק כהה) */
         #generateLinkButton {
             background-color: #388e3c; 
             color: white;
@@ -212,7 +212,7 @@
         .color-גולן { background-color: #a7ffeb; } .color-שלומי { background-color: #c5cae9; } .color-יובי { background-color: #ffd180; } .color-אמיר { background-color: #f8bbd0; }
         .color-חברוני { background-color: #b3e5fc; } .color-חגי { background-color: #ff8a80; } .color-ישי { background-color: #e0f2f1; } .color-ניר { background-color: #dcedc8; }
 
-        /* הודעת קישור שצפה - חדש */
+        /* הודעת קישור שצפה - חדש (נשאר למרות השינוי, אבל לא בשימוש) */
         #link-message {
             position: fixed;
             top: 50%;
@@ -249,7 +249,7 @@
             <div id="button-group">
                 <button id="analyzeButton">נתח נתונים 🔍</button>
                 <button id="downloadButton">הורד קובץ CSV ⬇️</button>
-                <button id="generateLinkButton">ייצור לינק לטבלה 🔗</button> <button id="resetButton">אפס נתונים 🗑️</button>
+                <button id="generateLinkButton">הורד טבלת HTML מעוצבת 💾</button> <button id="resetButton">אפס נתונים 🗑️</button>
             </div>
         </div>
         
@@ -262,8 +262,7 @@
     </div>
 
     <div id="link-message">
-        <p>✅ נוצר קובץ HTML זמני עם הטבלה המעוצבת בלבד.</p>
-        <p>הלינק נפתח בכרטיסייה חדשה/הורד למחשב.</p>
+        <p>✅ קובץ HTML הורד למחשבך!</p>
     </div>
 
     <script>
@@ -562,9 +561,9 @@
 
 
         /**
-         * פונקציה חדשה ליצירת לינק/הורדה של קובץ HTML שמכיל רק את הטבלה המעוצבת
+         * פונקציה מעודכנת להורדת קובץ HTML שמכיל רק את הטבלה המעוצבת
          */
-        function generateLinkForTable() {
+        function downloadHtmlTable() {
             if (!lastRenderedTableHTML) {
                 alert('אין טבלת משמרות מנותחת! אנא הפעל את "סדר אוטומטי 🤖" או "נתח נתונים 🔍" תחילה.');
                 return;
@@ -580,46 +579,55 @@
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>טבלת משמרות מעוצבת - מאור</title>
+                    <title>טבלת משמרות שבועית - מעוצבת</title>
                     <style>
                         /* סגנונות בסיסיים */
                         body { font-family: Arial, sans-serif; text-align: center; direction: rtl; background-color: #f7f9f9; color: #333; }
                         h2 { color: #00838f; padding-bottom: 15px; margin-bottom: 30px; }
                         
-                        /* מדביקים את ה-CSS של הטבלה והצבעים */
+                        /* מדביקים כאן את ה-CSS הרלוונטי - רק של הטבלאות */
                         ${style}
                         
-                        /* מבטלים תכנים לא רלוונטיים שנדרשים רק בדף המקור */
-                        #input-section-wrapper, #button-group, #autoScheduleButton { display: none; }
+                        /* הסתרת כפתורים ופונקציונליות לא רלוונטיים בדף המופרד */
+                        #input-section-wrapper, #button-group, #autoScheduleButton, #resetButton { display: none !important; }
                         
                     </style>
                 </head>
                 <body>
                     <h2>טבלת משמרות שבועית - משובצת וסופית (מעוצבת)</h2>
                     
-                    <div id="results-container">
+                    <div id="results-container" style="max-width: 90%; margin: 20px auto;">
                         ${lastRenderedTableHTML}
                     </div>
+                    <p style="text-align: center; color: #777; margin-top: 30px;">
+                        דף זה נוצר אוטומטית על ידי מנתח המשמרות.
+                    </p>
                 </body>
                 </html>
             `;
             
-            // יוצרים Blob (ייצוג קובץ)
-            const blob = new Blob([cleanHTMLContent], { type: 'text/html;charset=utf-8' });
+            // יצירת Blob (ייצוג קובץ)
+            // שימוש ב-BOM עבור תאימות עברית טובה יותר
+            const bom = '\ufeff'; 
+            const blob = new Blob([bom + cleanHTMLContent], { type: 'text/html;charset=utf-8' });
             
-            // יצירת לינק (URL) זמני ל-Blob
+            // יצירת לינק זמני להורדה
             const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = 'schedule_table_maor.html';
+            link.click(); 
+
+            // ניקוי המשאבים הזמניים
+            URL.revokeObjectURL(url);
             
-            // פתיחת הלינק בכרטיסייה חדשה
-            window.open(url, '_blank');
-            
-            // הצגת הודעה קצרה
-            const msg = document.getElementById('link-message');
+            // הצגת הודעה קצרה (במקום ההודעה הצפה הלא רלוונטית)
+             const msg = document.getElementById('link-message');
+            msg.querySelector('p').textContent = '✅ קובץ HTML הורד למחשבך!';
             msg.style.display = 'block';
             setTimeout(() => {
                 msg.style.display = 'none';
-                // שחרור ה-URL הזמני לאחר שימוש
-                URL.revokeObjectURL(url);
             }, 3000);
         }
 
@@ -792,8 +800,8 @@
         // אירוע לחיצה על כפתור האיפוס
         document.getElementById('resetButton').addEventListener('click', resetData);
 
-        // אירוע לחיצה על כפתור יצירת הלינק - חדש
-        document.getElementById('generateLinkButton').addEventListener('click', generateLinkForTable);
+        // אירוע לחיצה על כפתור הורדת ה-HTML (הפונקציה המעודכנת)
+        document.getElementById('generateLinkButton').addEventListener('click', downloadHtmlTable);
 
 
     </script>
