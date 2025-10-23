@@ -101,8 +101,8 @@
             font-size: 0.9em; 
             font-weight: bold;
             flex-grow: 1; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             white-space: nowrap; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         
         /* נתח נתונים */
@@ -186,12 +186,23 @@
         }
         th span.date-text {
             display: block;
-            font-size: 0.95em; /* גודל פונט מעט גדול יותר */
-            font-weight: bold; /* הופך את התאריך לבולט יותר */
+            font-size: 0.8em;
+            font-weight: normal;
             color: #006064;
             margin-top: 2px;
         }
         
+        /* סגנון השורה החדשה של ליווי 06:40 */
+        .red-assistance-shift { 
+            background-color: #ffebee !important; /* רקע אדום בהיר */
+            color: #d32f2f !important; /* טקסט אדום */
+            font-weight: bold; 
+        }
+        .red-assistance-shift .time-slot {
+            background-color: #ffcdd2; /* אדום בהיר יותר לעמודת השעות */
+            color: #d32f2f;
+        }
+
         /* נשאר זהה */
         .time-slot { width: 10%; background-color: #b3e5fc; font-weight: bold; text-align: center; color: #006064; }
         .person { display: inline-block; margin: 3px 4px; padding: 5px 10px; border-radius: 20px; white-space: nowrap; font-size: 0.9em; color: #1a1a1a; font-weight: bold; border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
@@ -249,6 +260,8 @@
             
             <p class="file-format-info" style="color: #4caf50; font-weight: bold;">
                 הנתונים שהוזנו כאן ישמשו לניתוח. **הסידור האוטומטי יתחשב רק בעובדים שרשמתם כאופציה לכל משבצת!**
+                <br>
+                **הערה:** משבצת 'ליווי 06:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
             </p>
             <textarea id="dataToAnalyze" 
                 title="נתוני משמרות לעריכה וניתוח"
@@ -276,85 +289,86 @@
     </div>
 
     <script>
-        // נתוני הבסיס המקוריים כמשתנה קבוע - **עודכן להוספת שורת "ליווי"**
+        // נתוני הבסיס המקוריים כמשתנה קבוע (עם שורה חדשה)
         const INITIAL_SCHEDULE_DATA = `יום ראשון
 02:00 - 06:00	סתיו	נתי	חסון	חורחה	ערן	לישע	גולן	שלומי					
+ליווי 06:40	
 06:00 - 10:00	ליאני	ערן	אמיר	יובי									
 10:00 - 14:00	חגי	חסון	ערן	ישי	גולן	אמיר	חברוני	חגי					
 14:00 - 18:00	ליאני	ערן	מאור	יובי	ישי								
 18:00 - 22:00	עידן יניב	ליאני	אסף	ערן	טגניה	חגי	ישי						
-18:00 - 22:00 (ליווי)	מאור	חסון	גולן	ניר	חברוני	שלומי	יובי						
 22:00 - 02:00	סתיו	נתי	אסף	חורחה	נמרוד	חסון	ערן	לישע	מאור				
 													
 יום שני													
 02:00 - 06:00	סתיו	נתי	חסון	ערן	לישע	ישי							
+ליווי 06:40	
 06:00 - 10:00	נמרוד	מאור	אמיר	חגי									
 10:00 - 14:00	חסון	ניר	חברוני	יובי	גולן	ישי	שלומי						
 14:00 - 18:00	מאור	ניר	יובי	אמיר	חגי								
 18:00 - 22:00	ליאני	אסף	טגניה	חורחה	ישי	אמיר							
-18:00 - 22:00 (ליווי)	סתיו	נתי	ערן	לישע	נמרוד	חורחה	טגניה						
 22:00 - 02:00	עידן יניב	נתי	אסף	חורחה	לישע	חברוני	חגי						
 													
 יום שלישי													
 02:00 - 06:00	נתי	אסף	ערן	טגניה	חגי	ישי							
+ליווי 06:40	
 06:00 - 10:00	אסף	נמרוד	ערן	יובי	גולן								
 10:00 - 14:00	ליאני	אסף	חסון	ערן	חגי	ישי							
 14:00 - 18:00	אסף	ניר	אמיר	יובי									
 18:00 - 22:00	ליאני	חסון	נמרוד	ערן	טגניה	חברוני	ישי	שלומי					
-18:00 - 22:00 (ליווי)	סתיו	מאור	חגי	אמיר	ניר	יובי						
 22:00 - 02:00	עידן יניב	סתיו	נתי	חסון	נמרוד	ערן	גולן	חברוני					
 													
 יום רביעי													
 02:00 - 06:00	עידן יניב	סתיו	נתי	נמרוד	חסון	ערן							
+ליווי 06:40	
 06:00 - 10:00	ליאני	נמרוד	ערן	מאור	אמיר	גולן	חגי						
 10:00 - 14:00	ליאני	חסון	ערן	חברוני	ישי	חגי							
 14:00 - 18:00	ליאני	חסון	ניר	אמיר	גולן								
 18:00 - 22:00	עידן יניב	ליאני	אסף	ערן	לישע	טגניה	מאור						
-18:00 - 22:00 (ליווי)	סתיו	נתי	חסון	חורחה	יובי	ישי	חברוני						
 22:00 - 02:00	סתיו	נתי	אסף	חורחה	נמרוד	ערן	לישע	מאור					
 													
 יום חמישי													
 02:00 - 06:00	סתיו	נתי	חסון	ערן	לישע	יובי	חגי	שלומי					
+ליווי 06:40	
 06:00 - 10:00	ליאני	ערן	מאור	חורחה	יובי	אמיר	גולן						
 10:00 - 14:00	ליאני	ערן	ניר	ישי									
 14:00 - 18:00	ליאני	חסון	ניר	חורחה	יובי	גולן							
 18:00 - 22:00	ליאני	אסף	חברוני	חורחה	לישע	מאור	ישי	חגי					
-18:00 - 22:00 (ליווי)	עידן יניב	נתי	נמרוד	אסף	ערן	טגניה	אמיר						
 22:00 - 02:00	עידן יניב	סתיו	נתי	נמרוד	אסף	ערן	לישע	טגניה	מאור				
 													
 יום שישי													
 02:00 - 06:00	עידן יניב	סתיו	נתי	נמרוד	אסף	ערן	טגניה						
+ליווי 06:40	
 06:00 - 10:00	עידן יניב	אסף	מאור	חורחה	אמיר	גולן							
 10:00 - 14:00	אסף	ישי	חגי										
 14:00 - 18:00	אסף	חגי	ניר	חורחה	יובי	אמיר	גולן						
 18:00 - 22:00	נמרוד	טגניה											
-18:00 - 22:00 (ליווי)	סתיו	ליאני	חסון	ערן	לישע	חברוני	שלומי						
 22:00 - 02:00	ליאני	נתי	אסף	נמרוד	לישע	מאור	חברוני						
 													
 יום שבת													
 02:00 - 06:00	עידן יניב	נתי	אסף	חורחה	טגניה	שלומי	חברוני						
+ליווי 06:40	
 06:00 - 10:00	עידן יניב	אסף	נמרוד	חורחה	חגי	אמיר		חגי					
 10:00 - 14:00	גולן	שלומי	ישי	יובי	חברוני								
 14:00 - 18:00	גולן	אמיר	חברוני	יובי									
 18:00 - 22:00	לישע	נמרוד	ניר	חברוני	ישי								
-18:00 - 22:00 (ליווי)	ליאני	סתיו	נתי	חסון	ערן	מאור	טגניה						
 22:00 - 02:00	ליאני	נתי	אסף	נמרוד	לישע	מאור	חברוני`;
 
         // משתנה גלובלי לשמירת קוד ה-HTML של הטבלה המעוצבת
         let lastRenderedTableHTML = '';
 
 
-        // הגדרות קבועות - **עודכן להוספת "ליווי"**
+        // הגדרות קבועות (עודכנו לכלול את המשבצת החדשה)
         const MIN_REQUIRED = 3;
         const MAX_ALLOWED = 4;
         const EXPECTED_DAYS = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
+        // **שינוי כאן: הוספת משבצת השעות החדשה**
         const EXPECTED_TIME_SLOTS = [
             '02:00 - 06:00 (Night)', 
+            'ליווי 06:40 (Assist)', 
             '06:00 - 10:00', 
             '10:00 - 14:00', 
             '14:00 - 18:00', 
             '18:00 - 22:00', 
-            '18:00 - 22:00 (ליווי)', // משבצת חדשה
             '22:00 - 02:00 (Night)'
         ];
 
@@ -368,7 +382,7 @@
         };
 
         /**
-         * פונקציה לאתחול הנתונים והצבת תאריך יום ראשון
+         * פונקציה לאתחול הנתונים והצבת תאריך יום ראשון (היום הנוכחי)
          */
         function initializeData() {
             document.getElementById('dataToAnalyze').value = INITIAL_SCHEDULE_DATA; 
@@ -376,6 +390,7 @@
             // הגדרת תאריך היום כברירת מחדל לתאריך יום ראשון
             const today = new Date();
             let dayOfWeek = today.getDay(); // 0 = ראשון, 6 = שבת
+            let diff = dayOfWeek === 0 ? 0 : dayOfWeek * -1; // אם היום ראשון אין הפרש, אחרת הולכים אחורה
             
             // אם היום לא ראשון, הולכים אחורה ליום ראשון של השבוע הנוכחי
             if (dayOfWeek !== 0) {
@@ -409,19 +424,28 @@
         }
 
         /**
-         * פונקציה לניקוי אגרסיבי של שורה מתווים בלתי נראים וריווח
+         * פונקציה לניקוי אגרסיבי של שורה מתווים בלתי נראים וריווח (נשארת זהה)
          */
         function aggressiveClean(line) {
             return line.replace(/[\u0000-\u001F\u007F-\u009F\uFEFF\u00A0]/g, '').trim();
         }
         
         /**
-         * פונקציה לעיבוד טקסט עם חלוקה אנכית לפי ימים - **עודכן ל-7 משבצות**
+         * פונקציה לעיבוד טקסט עם חלוקה אנכית לפי ימים (נשארת זהה)
          */
         function parseVerticalText(text) {
             const lines = text.split(/\r?\n|\r/); 
             const rawDayData = {};
             let currentDay = null;
+            
+            // יצירת מפת בדיקה עבור סלוטים של שעות
+            const timeSlotCheckMap = {};
+            EXPECTED_TIME_SLOTS.forEach(slot => {
+                // לוקחים רק את החלק של השעות
+                const timePart = slot.split('(')[0].trim();
+                timeSlotCheckMap[timePart] = slot;
+            });
+            
 
             lines.forEach(line => {
                 const cleanedLine = aggressiveClean(line);
@@ -436,15 +460,16 @@
                     currentDay = dayMatch;
                     rawDayData[currentDay] = [];
                 } else if (currentDay) {
+                    // חלוקה לפי טאבים או רווחים מרובים
                     const parts = line.split(/\s{2,}|\t/).map(p => p.trim()); 
                     const timeSlotString = parts[0];
-                    // בדיקה מתוחכמת יותר כדי להתאים גם ל"(ליווי)"
-                    const isTimeSlot = EXPECTED_TIME_SLOTS.some(slot => 
-                        timeSlotString && 
-                        (slot.includes(timeSlotString.split(' ')[0]) && slot.includes(timeSlotString.split(' ')[2]))
-                    ); 
+                    
+                    // בדיקה האם החלק הראשון הוא משבצת שעות מוכרת
+                    const isTimeSlot = Object.keys(timeSlotCheckMap).some(timePart => timeSlotString && timeSlotString.startsWith(timePart));
+                    // בדיקה מיוחדת ל'ליווי 06:40'
+                    const isAssistanceSlot = timeSlotString === 'ליווי 06:40';
 
-                    if (parts.length > 0 && isTimeSlot) {
+                    if (parts.length > 0 && (isTimeSlot || isAssistanceSlot)) {
                         const potentialNames = parts.slice(1);
                         const names = potentialNames.filter(name => name.length > 0).map(name => name.trim());
                         rawDayData[currentDay].push(names.join(','));
@@ -459,16 +484,14 @@
             }
 
             const scheduleTable = []; 
-            const expectedSlotsCount = EXPECTED_TIME_SLOTS.length; // כעת 7
-            
-            for (let i = 0; i < expectedSlotsCount; i++) {
+            for (let i = 0; i < EXPECTED_TIME_SLOTS.length; i++) {
                 const row = [];
                 for (let j = 0; j < EXPECTED_DAYS.length; j++) {
                     const day = EXPECTED_DAYS[j];
                     const dayShifts = rawDayData[day];
                     
-                    if (!dayShifts || dayShifts.length !== expectedSlotsCount) {
-                        return { error: `שגיאה ביום **${day}**: נמצאו רק ${dayShifts?.length || 0} משבצות במקום ${expectedSlotsCount} משבצות. יש לוודא שקיימת שורה עבור **18:00 - 22:00 (ליווי)** ביום זה.` };
+                    if (!dayShifts || dayShifts.length !== EXPECTED_TIME_SLOTS.length) {
+                        return { error: `שגיאה ביום **${day}**: נמצאו רק ${dayShifts?.length || 0} משמרות במקום ${EXPECTED_TIME_SLOTS.length} משמרות. יש לתקן את כמות השורות ביום זה.` };
                     }
                     row.push(dayShifts[i]);
                 }
@@ -479,7 +502,7 @@
         }
 
         /**
-         * פונקציה לבניית הטבלה וביצוע הניתוח
+         * פונקציה לבניית הטבלה וביצוע הניתוח - כולל הצגת תאריכים
          */
         function renderSchedule(parsedData) {
             const resultsContainer = document.getElementById('results-container');
@@ -501,7 +524,7 @@
             // **1. יצירת HTML עבור הטבלה המנותחת**
             let tableHTML = '<h3>טבלת משמרות מנותחת</h3>';
             
-            tableHTML += '<p class="file-format-info" style="text-align: center; color: #4db6ac;">**הגדרות:** משמרת יום (06:00-22:00) וליווי: 1 עובד. משמרת לילה (02:00-06:00, 22:00-02:00): עד 2 עובדים.</p>';
+            tableHTML += '<p class="file-format-info" style="text-align: center; color: #4db6ac;">**הגדרות:** משמרת יום (06:00-22:00): 1 עובד. משמרת לילה (02:00-06:00, 22:00-02:00): עד 2 עובדים.</p>';
 
             // יצירת טבלת הנתונים הראשית
             let scheduleTableHTML = '<table id="schedule-table"><thead><tr><th>שעות / יום</th>';
@@ -518,16 +541,18 @@
             
             scheduleData.forEach((row, rowIndex) => {
                 const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
-                // לוגיקה לקביעת סוג המשמרת
+                // **שינוי כאן: הגדרת סוג המשמרת**
                 const isNightShift = timeSlotFull.includes('(Night)');
-                const isLivyShift = timeSlotFull.includes('(ליווי)');
+                const isAssistanceShift = timeSlotFull.includes('(Assist)'); 
+                const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
                 
-                const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (ליווי)', ' (ליווי)');
-                
-                // משמרות יום (רגילות וליווי) דורשות 1 עובד. משמרות לילה דורשות 2.
+                // ליווי 06:40 מוגדר כמשמרת יום (מקסימום 1), לילה מקסימום 2, השאר מקסימום 1.
                 const maxAllowedInShift = isNightShift ? 2 : 1; 
                 
-                scheduleTableHTML += `<tr><td class="time-slot">${timeSlotDisplay}</td>`;
+                // **שינוי כאן: הוספת מחלקת CSS לשורה החדשה**
+                const rowClass = isAssistanceShift ? 'red-assistance-shift' : '';
+                
+                scheduleTableHTML += `<tr class="${rowClass}"><td class="time-slot">${timeSlotDisplay}</td>`;
 
                 row.forEach((cellContent, colIndex) => {
                     const day = dayHeaders[colIndex];
@@ -539,9 +564,8 @@
                     let dailyDuplicateFound = false;
                     names.forEach(name => {
                         const cleanedName = name.trim();
-                        // 1. בדיקת כפילות יומית
-                        // בדיקת כפילות מתבצעת בין *כל* המשבצות ביום
-                        if (dailyCheck[day].has(cleanedName)) { 
+                        // 1. בדיקת כפילות יומית (לא כולל ליווי 06:40)
+                        if (!isAssistanceShift && dailyCheck[day].has(cleanedName)) {
                             dailyDuplicateFound = true;
                         }
                         dailyCheck[day].add(cleanedName);
@@ -553,23 +577,29 @@
                     // עיצוב התא
                     let cellClass = '';
                     let warningText = '';
-                    
+
                     if (numNames === 0) {
-                        cellClass = 'needs-selection';
-                        warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
+                        // אם זו משמרת ליווי, ריק זה אופציונלי, אחרת דורש בחירה
+                        if (isAssistanceShift) {
+                            cellClass = ''; // אין צורך ב-needs-selection כי לא חייב להיות שם מישהו
+                            warningText = '<span class="warning-text" style="color:#00838f;">משבצת ליווי ידנית</span>';
+                        } else {
+                            cellClass = 'needs-selection';
+                            warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
+                        }
                     } else if (dailyDuplicateFound) {
                         cellClass = 'daily-duplicate-warning';
                         warningText = '<span class="warning-text">⚠️ כפילות יומית!</span>';
                     } else if (numNames > maxAllowedInShift && numNames > 0) {
                          // אם יש יותר עובדים ממה שנדרש, אנחנו מציגים אזהרה
-                        cellClass = 'needs-selection'; 
-                        warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
+                         cellClass = 'needs-selection'; 
+                         warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
                     } else {
-                        // אם זו משמרת ליווי, אפשר לתת לה צבע מעט שונה או לשלב צבע
-                        if (isLivyShift) {
-                             cellClass = 'night-shift-ok'; // משתמשים בצבע של לילה כי הוא שונה מיום
+                        // **שינוי כאן: קביעת קלאס לפי סוג המשמרת**
+                        if (isAssistanceShift) {
+                            cellClass = 'red-assistance-shift';
                         } else {
-                             cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
+                            cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
                         }
                     }
 
@@ -667,6 +697,7 @@
             headerReplacement += '</tr>';
 
             // החלפת הכותרת הישנה (שמורה ב-lastRenderedTableHTML) בחדשה
+            // חיפוש ה-HTML של כותרת הטבלה ב-lastRenderedTableHTML
             const originalHeaderMatch = lastRenderedTableHTML.match(/<thead>(.*?)<\/thead>/s);
             if (originalHeaderMatch) {
                 const originalHeaderContent = originalHeaderMatch[1];
@@ -691,7 +722,7 @@
                         body { font-family: Arial, sans-serif; text-align: center; direction: rtl; background-color: #f7f9f9; color: #333; }
                         h2 { color: #00838f; padding-bottom: 15px; margin-bottom: 30px; }
                         
-                        /* מדביקים כאן את ה-CSS הרלוונטי - כולל סגנון התאריכים */
+                        /* מדביקים כאן את ה-CSS הרלוונטי - כולל סגנון התאריכים והליווי */
                         ${style}
                         
                         /* הסתרת כפתורים ופונקציונליות לא רלוונטיים בדף המופרד */
@@ -728,7 +759,7 @@
             URL.revokeObjectURL(url);
             
             // הצגת הודעה קצרה 
-             const msg = document.getElementById('link-message');
+            const msg = document.getElementById('link-message');
             msg.querySelector('p').textContent = '✅ קובץ HTML הורד למחשבך!';
             msg.style.display = 'block';
             setTimeout(() => {
@@ -736,7 +767,7 @@
             }, 3000);
         }
 
-        // פונקציה חדשה לסידור אוטומטי של המשמרות - עם אילוצים - **עודכן ל-7 משבצות**
+        // פונקציה חדשה לסידור אוטומטי של המשמרות - עם אילוצים (עודכנה להתעלם מהשורה החדשה)
         function autoSchedule() {
             const textContent = document.getElementById('dataToAnalyze').value;
             const startDateString = document.getElementById('startDate').value;
@@ -755,6 +786,12 @@
 
             const availabilityMap = {};
             initialParsedData.data.forEach((row, shiftIndex) => {
+                const timeSlotFull = EXPECTED_TIME_SLOTS[shiftIndex];
+                // **שינוי כאן: דילוג על משבצת הליווי בסידור האוטומטי**
+                if (timeSlotFull.includes('(Assist)')) {
+                    return; 
+                }
+                
                 row.forEach((cellContent, dayIndex) => {
                     const day = initialParsedData.days[dayIndex];
                     const names = cellContent.split(',').map(name => name.trim()).filter(name => name.length > 0);
@@ -766,111 +803,165 @@
             });
 
             const employees = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
-            const schedule = []; 
-            const employeeShifts = {}; 
-            employees.forEach(name => employeeShifts[name] = 0);
             
-            const expectedSlotsCount = EXPECTED_TIME_SLOTS.length; // כעת 7
-
+            // יצירת מערך שמתאים לגודל של כל המשבצות (כולל הליווי)
+            const schedule = []; 
             for (let i = 0; i < EXPECTED_DAYS.length; i++) {
                 schedule[i] = [];
-                for (let j = 0; j < expectedSlotsCount; j++) {
+                for (let j = 0; j < EXPECTED_TIME_SLOTS.length; j++) {
                     schedule[i][j] = []; 
                 }
             }
 
+            const employeeShifts = {}; 
+            employees.forEach(name => employeeShifts[name] = 0);
+            
+            // העתקת נתוני הליווי הקיימים ללוח הזמנים הסופי לפני הסידור
+            for (let dayIndex = 0; dayIndex < EXPECTED_DAYS.length; dayIndex++) {
+                const day = EXPECTED_DAYS[dayIndex];
+                for (let shiftIndex = 0; shiftIndex < EXPECTED_TIME_SLOTS.length; shiftIndex++) {
+                    const timeSlotFull = EXPECTED_TIME_SLOTS[shiftIndex];
+                    if (timeSlotFull.includes('(Assist)')) {
+                         const initialNames = initialParsedData.data[shiftIndex][dayIndex].split(',').map(name => name.trim()).filter(name => name.length > 0);
+                         schedule[dayIndex][shiftIndex] = initialNames;
+                         // עדכון מניין משמרות כולל הליווי
+                         initialNames.forEach(name => {
+                             employeeShifts[name] = (employeeShifts[name] || 0) + 1;
+                         });
+                    }
+                }
+            }
+            
+            // מעבר על ימים ושיבוץ (כמו קודם, מתוך זמינויות ומתוך מגבלת משמרות)
             for (let dayIndex = 0; dayIndex < EXPECTED_DAYS.length; dayIndex++) {
                 const day = EXPECTED_DAYS[dayIndex];
                 const dayAssignments = new Set(); 
                 
-                for (let shiftIndex = 0; shiftIndex < expectedSlotsCount; shiftIndex++) {
+                for (let shiftIndex = 0; shiftIndex < EXPECTED_TIME_SLOTS.length; shiftIndex++) {
                     const timeSlotFull = EXPECTED_TIME_SLOTS[shiftIndex];
+                    
+                    // **דילוג על שורת הליווי**
+                    if (timeSlotFull.includes('(Assist)')) {
+                         continue; 
+                    }
+                    
                     const isNightShift = timeSlotFull.includes('(Night)');
-                    // משמרות יום (רגילות וליווי) דורשות 1 עובד. משמרות לילה דורשות 2.
-                    const maxRequired = isNightShift ? 2 : 1; 
+                    const maxRequired = isNightShift ? 2 : 1;
                     
-                    const registeredForSlot = availabilityMap[day] && availabilityMap[day][shiftIndex] ? Array.from(availabilityMap[day][shiftIndex]) : [];
-
-                    if (registeredForSlot.length === 0) {
-                         schedule[dayIndex][shiftIndex] = []; 
-                         continue;
-                    }
-
-                    let eligibleCandidates = employees.filter(name => {
-                        if (!registeredForSlot.includes(name)) { return false; } 
-                        if (dayAssignments.has(name)) { return false; }
-                        if (employeeShifts[name] >= MAX_ALLOWED) { return false; }
-                        return true;
-                    });
+                    const availableNamesSet = availabilityMap[day][shiftIndex];
+                    const availableNames = Array.from(availableNamesSet).sort((a, b) => employeeShifts[a] - employeeShifts[b]); // עדיפות למי שיש לו פחות משמרות
                     
-                    eligibleCandidates.sort((a, b) => {
-                        return employeeShifts[a] - employeeShifts[b];
-                    });
-                    
-                    const assignedPeople = [];
-                    
-                    for (let i = 0; i < maxRequired; i++) {
-                        if (eligibleCandidates.length === 0) break;
-
-                        const selectedEmployee = eligibleCandidates.shift(); 
-                        assignedPeople.push(selectedEmployee);
-                        
-                        employeeShifts[selectedEmployee]++;
-                        dayAssignments.add(selectedEmployee);
+                    const selectedNames = [];
+                    for (const name of availableNames) {
+                        // מגבלות: מקסימום 4 בשבוע, מקסימום 1 ביום
+                        if (employeeShifts[name] < MAX_ALLOWED && !dayAssignments.has(name) && selectedNames.length < maxRequired) {
+                            selectedNames.push(name);
+                            employeeShifts[name]++;
+                            dayAssignments.add(name);
+                        }
                     }
                     
-                    schedule[dayIndex][shiftIndex] = assignedPeople;
+                    schedule[dayIndex][shiftIndex] = selectedNames;
                 }
             }
-            
-            let newScheduleText = '';
-            
-            for (let dayIndex = 0; dayIndex < EXPECTED_DAYS.length; dayIndex++) {
-                const dayName = EXPECTED_DAYS[dayIndex];
-                newScheduleText += dayName + '\n';
-                
-                for (let shiftIndex = 0; shiftIndex < expectedSlotsCount; shiftIndex++) {
-                    // יוצרים תצוגה נקייה יותר של שעות/משבצת
-                    const fullSlot = EXPECTED_TIME_SLOTS[shiftIndex];
-                    let timeSlotDisplay = fullSlot.split(' ')[0] + ' - ' + fullSlot.split(' ')[2]; 
-                    if (fullSlot.includes('(ליווי)')) {
-                        timeSlotDisplay += ' (ליווי)';
-                    } else if (fullSlot.includes('(Night)')) {
-                        timeSlotDisplay += ' (Night)';
-                    }
 
+            // יצירת טקסט הנתונים המעודכן לתוך תיבת הקלט
+            let newTextContent = '';
+            for (let dayIndex = 0; dayIndex < EXPECTED_DAYS.length; dayIndex++) {
+                const day = EXPECTED_DAYS[dayIndex];
+                newTextContent += day + '\n';
+                
+                for (let shiftIndex = 0; shiftIndex < EXPECTED_TIME_SLOTS.length; shiftIndex++) {
+                    const timeSlotFull = EXPECTED_TIME_SLOTS[shiftIndex];
+                    const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
                     const assignedNames = schedule[dayIndex][shiftIndex];
                     
-                    newScheduleText += timeSlotDisplay + '\t' + assignedNames.join('\t') + '\n';
+                    // רישום כל העובדים ששובצו, עם טאב לפני כל שם
+                    const namesLine = assignedNames.join('\t');
+
+                    // במקרה של משמרת שלא שובצה, נשתמש בנתוני הזמינות המקורית, 
+                    // אך רק אם השורה לא ריקה לחלוטין.
+                    const originalContent = initialParsedData.data[shiftIndex][dayIndex];
+                    
+                    let outputLine = '';
+                    if (assignedNames.length > 0) {
+                        // אם שובץ - נרשום את המשובצים
+                         outputLine = timeSlotDisplay + '\t' + namesLine;
+                    } else if (timeSlotFull.includes('(Assist)')) {
+                         // אם זה משבצת ליווי - נרשום את הקלט המקורי
+                         outputLine = timeSlotDisplay + '\t' + originalContent.replace(/,/g, '\t');
+                    } else if (originalContent && !timeSlotFull.includes('(Assist)')) {
+                        // אם זה משבצת רגילה ולא שובץ אף אחד, נשמור את כל הזמינויות שהוזנו
+                        outputLine = timeSlotDisplay + '\t' + originalContent.replace(/,/g, '\t');
+                    } else {
+                        // אם אין שום דבר בשורה
+                        outputLine = timeSlotDisplay + '\t\t'; 
+                    }
+                    
+                    newTextContent += outputLine + '\n';
                 }
-                newScheduleText += '\n';
+                newTextContent += '\n'; // רווח בין ימים
             }
             
-            document.getElementById('dataToAnalyze').value = newScheduleText.trim();
-            document.getElementById('analyzeButton').click();
+            // עדכון תיבת הטקסט בנתונים החדשים
+            document.getElementById('dataToAnalyze').value = newTextContent.trim();
+            
+            // ניתוח והצגת הנתונים החדשים
+            const reParsedData = parseVerticalText(newTextContent.trim());
+            renderSchedule(reParsedData);
+            
+            document.getElementById('results-container').insertAdjacentHTML('afterbegin', '<p class="file-format-info" style="text-align: center; color: #673AB7; font-size: 1.1em; font-weight: bold;">✅ הסידור האוטומטי הסתיים! הנתונים בתיבת הטקסט עודכנו.</p>');
         }
 
-        /**
-         * פונקציה לייצוא נתונים כקובץ CSV - כולל תיקון לקידוד עברית (נשארת זהה)
-         */
-        function exportToCsv() {
+        // קישור פונקציות לכפתורים
+        document.getElementById('analyzeButton').addEventListener('click', () => {
             const textContent = document.getElementById('dataToAnalyze').value;
-            
-            if (!textContent.trim()) {
-                alert('אין נתונים לייצוא! אנא הפעל את "סדר אוטומטי 🤖" או הזן נתונים ידנית.');
+            renderSchedule(parseVerticalText(textContent));
+        });
+        document.getElementById('resetButton').addEventListener('click', () => {
+            if (confirm('האם אתה בטוח שברצונך לאפס את הנתונים לערכי ברירת המחדל?')) {
+                initializeData();
+                document.getElementById('results-container').innerHTML = '<p id="initial-message">הטעינה הראשונית תפעיל את הניתוח אוטומטית.</p>';
+                document.getElementById('analyzeButton').click();
+            }
+        });
+        document.getElementById('downloadButton').addEventListener('click', downloadCsv); // שימוש בפונקציה הישנה
+        document.getElementById('generateLinkButton').addEventListener('click', downloadHtmlTable); 
+        document.getElementById('autoScheduleButton').addEventListener('click', autoSchedule);
+
+        // פונקציה להורדת CSV (שונתה כדי להתאים לפורמט החדש)
+        function downloadCsv() {
+            const textContent = document.getElementById('dataToAnalyze').value;
+            const parsedData = parseVerticalText(textContent);
+
+            if (parsedData.error) {
+                alert('שגיאה בנתונים. לא ניתן לייצא CSV.');
                 return;
             }
 
-            let csvContent = textContent.replace(/\t/g, ','); 
-            
-            const bom = '\ufeff'; 
-            csvContent = bom + csvContent;
+            const { days: dayHeaders, data: scheduleData } = parsedData;
 
-            const filename = 'schedule_shifts_by_auto_scheduler.csv';
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
+            // יצירת שורת כותרת CSV
+            let csvContent = "שעות," + dayHeaders.join(',') + "\n";
+
+            // יצירת שורות הנתונים
+            scheduleData.forEach((row, rowIndex) => {
+                const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
+                const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
+                
+                // הוספת עמודת השעות ושאר הנתונים (שמות מופרדים בקו מפריד)
+                csvContent += timeSlotDisplay + "," + row.map(cell => `"${cell}"`).join(',') + "\n";
+            });
+
+            const startDateString = document.getElementById('startDate').value || 'schedule';
+            const filename = `schedule_${startDateString}.csv`;
             
-            if (link.download !== undefined) {
+            // יצירת Blob עם BOM לעברית
+            const bom = '\ufeff'; 
+            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
                 const url = URL.createObjectURL(blob);
                 link.setAttribute("href", url);
                 link.setAttribute("download", filename);
@@ -878,59 +969,9 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } else {
-                alert('הדפדפן שלך אינו תומך בהורדה אוטומטית. אנא העתק את הטקסט באופן ידני.');
             }
         }
-
-        /**
-         * פונקציה לאיפוס נתונים (נשארת זהה)
-         */
-        function resetData() {
-            document.getElementById('dataToAnalyze').value = '';
-            document.getElementById('results-container').innerHTML = '<p id="initial-message" style="color: #03a9f4; font-weight: bold;">הנתונים אופסו. אנא הדבק נתונים חדשים או השתמש בכפתור הסידור האוטומטי (לאחר הזנת אילוצים).</p>';
-            lastRenderedTableHTML = ''; 
-        }
-
-
-        // אירוע לחיצה על כפתור הניתוח
-        document.getElementById('analyzeButton').addEventListener('click', () => {
-            const textContent = document.getElementById('dataToAnalyze').value; 
-            
-            if (!textContent.trim()) {
-                 document.getElementById('results-container').innerHTML = '<p class="warning-text">❌ אנא הדבק את נתוני המשמרות בתיבת העריכה.</p>';
-                return;
-            }
-            
-            const parsedData = parseVerticalText(textContent);
-            
-            if (parsedData && !parsedData.error) {
-                renderSchedule(parsedData);
-            } else {
-                const errorMessage = parsedData?.error || 'הנתונים שהודבקו אינם בפורמט תקין או שהתרחשה שגיאה פנימית בלתי צפויה.';
-                document.getElementById('results-container').innerHTML = `<p class="warning-text">❌ שגיאה בניתוח הנתונים: ${errorMessage}</p>`;
-            }
-        });
         
-        // אירוע לחיצה על כפתור הסידור האוטומטי
-        document.getElementById('autoScheduleButton').addEventListener('click', autoSchedule);
-        
-        // אירוע לחיצה על כפתור ההורדה
-        document.getElementById('downloadButton').addEventListener('click', exportToCsv);
-        
-        // אירוע לחיצה על כפתור האיפוס
-        document.getElementById('resetButton').addEventListener('click', resetData);
-
-        // אירוע לחיצה על כפתור הורדת ה-HTML
-        document.getElementById('generateLinkButton').addEventListener('click', downloadHtmlTable);
-
-        // אירוע שינוי בתאריך - מפעיל ניתוח מחדש כדי לעדכן את הטבלה
-        document.getElementById('startDate').addEventListener('change', () => {
-             document.getElementById('analyzeButton').click();
-        });
-
-
     </script>
-
 </body>
 </html>
