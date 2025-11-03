@@ -158,7 +158,7 @@
             background-color: var(--light-blue-bg);
         }
 
-        /* שורה ספציפית: ליווי 06:40 באדום בולט */
+        /* שורה ספציפית: ליווי 07:40 באדום בולט */
         .red-assistance-shift {
             background-color: #ffcdd2 !important; /* רקע אדום בהיר */
             color: #b71c1c; /* טקסט אדום כהה */
@@ -316,7 +316,7 @@
             <p class="file-format-info">
                 הנתונים שהוזנו כאן ישמשו לניתוח. **הסידור האוטומטי יתחשב רק בעובדים שרשמתם כאופציה לכל משבצת!**
                 <br>
-                **הערה חשובה:** משבצת 'ליווי 06:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
+                **הערה חשובה:** משבצת 'ליווי 07:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
             </p>
             <textarea id="dataToAnalyze" 
                 title="נתוני משמרות לעריכה וניתוח"
@@ -366,7 +366,7 @@
         const EXPECTED_DAYS = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
         // **שינוי כאן: הוספת משבצת השעות החדשה**
         const EXPECTED_TIME_SLOTS = [
-            'ליווי 06:40 (Assist)',
+            'ליווי 07:40 (Assist)',
             '02:00 - 06:00 (Night)', 
             '06:00 - 10:00', 
             '10:00 - 14:00', 
@@ -476,8 +476,8 @@
                     
                     // בדיקה האם החלק הראשון הוא משבצת שעות מוכרת
                     const isTimeSlot = Object.keys(timeSlotCheckMap).some(timePart => timeSlotString && timeSlotString.startsWith(timePart));
-                    // בדיקה מיוחדת ל'ליווי 06:40'
-                    const isAssistanceSlot = timeSlotString === 'ליווי 06:40';
+                    // בדיקה מיוחדת ל'ליווי 07:40'
+                    const isAssistanceSlot = timeSlotString === 'ליווי 07:40';
 
                     if (parts.length > 0 && (isTimeSlot || isAssistanceSlot)) {
                         const potentialNames = parts.slice(1);
@@ -565,7 +565,7 @@
                 const isNight2to6 = rowIndex === NIGHT_SHIFT_2_6_INDEX; // **זיהוי המשמרת הספציפית**
                 const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
                 
-                // ליווי 06:40 מוגדר כמשמרת יום (מקסימום 1), לילה מקסימום 2, השאר מקסימום 1.
+                // ליווי 07:40 מוגדר כמשמרת יום (מקסימום 1), לילה מקסימום 2, השאר מקסימום 1.
                 const maxAllowedInShift = isNightShift ? 2 : 1; 
                 
                 // **שינוי כאן: הוספת מחלקת CSS לשורה החדשה**
@@ -583,7 +583,7 @@
                     let dailyDuplicateFound = false;
                     names.forEach(name => {
                         const cleanedName = name.trim();
-                        // 1. בדיקת כפילות יומית (לא כולל ליווי 06:40)
+                        // 1. בדיקת כפילות יומית (לא כולל ליווי 07:40)
                         if (!isAssistanceShift && dailyCheck[day].has(cleanedName)) {
                             dailyDuplicateFound = true;
                         }
