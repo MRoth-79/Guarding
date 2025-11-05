@@ -15,11 +15,11 @@
             --btn-download: #546E7A; 
             --btn-generate: #1976D2; 
             --btn-reset: #E53935; 
-            --btn-auto: #00BCD4; /* טורקיז בולט */
+			--btn-auto: #1A237E; 
             --text-color: #212121;
             --border-color: #E0E0E0;
             --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            --summary-header: #37474F; /* אפור כחול כהה לסיכום */
+            --summary-header: #37474F;
         }
 
         body {
@@ -86,11 +86,12 @@
             background-color: var(--btn-auto); 
             padding: 15px 40px;
             font-size: 19px;
-            box-shadow: 0 6px 15px rgba(0, 188, 212, 0.4); /* צל טורקיז */
+            box-shadow: 0 6px 15px rgba(26, 35, 126, 0.6); 
             max-width: 400px;
             width: 100%;
+			color: white;
         }
-
+		
         #button-group {
             display: flex;
             flex-wrap: wrap;
@@ -169,7 +170,7 @@
         /* סגנון ליווי */
         .red-assistance-shift {
             background-color: #FFFDE7 !important; 
-            color: var(--btn-auto); 
+            color: #1593C2; 
             font-weight: bold;
         }
         .red-assistance-shift td {
@@ -189,12 +190,12 @@
             padding: 4px 10px;
             margin: 3px 1px;
             border-radius: 20px;
-            font-size: 0.9em;
+            font-size: 1.3em;
             font-weight: 600;
             cursor: help;
             transition: all 0.2s;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            text-shadow: none;
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.25);
         }
         
         .person:hover {
@@ -202,17 +203,30 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
         
-        /* ** מפת צבעים מודרנית לשמות ** */
-        .color-נתי, .color-אמיר { background-color: #B3E5FC; color: #0288D1; }
-        .color-יובי, .color-ישי { background-color: #BBDEFB; color: #1565C0; }
-        .color-סתיו, .color-חגי { background-color: #C8E6C9; color: #388E3C; }
-        .color-ליאני, .color-נמרוד { background-color: #B2DFDB; color: #00796B; }
-        .color-מאור, .color-גולן { background-color: #FFCCBC; color: #D84315; }
-        .color-חסון, .color-שלומי { background-color: #FFE0B2; color: #F57C00; }
-        .color-חורחה, .color-טגניה { background-color: #E1BEE7; color: #8E24AA; }
-        .color-ניר, .color-אסף { background-color: #F8BBD0; color: #C2185B; }
-        .color-ערן, .color-חברוני { background-color: #E0E0E0; color: #616161; }
-        .color-עידן_יניב, .color-לישע { background-color: #CFD8DC; color: #455A64; }
+		 /* ** מפת צבעים מודרנית לשמות (22 שומרים ייחודיים) ** */
+		.color-אמיר { background-color: #fce4ec; color: #ad1457; } /* ורוד בהיר */
+		.color-נמרוד { background-color: #e1f5fe; color: #0277bd; } /* כחול בהיר */
+		.color-יובי { background-color: #fff8e1; color: #ff8f00; } /* צהוב חם */
+		.color-טגניה { background-color: #e8f5e9; color: #2e7d32; } /* ירוק בהיר */
+		.color-ישי { background-color: #f3e5f5; color: #6a1b9a; } /* סגול לילך */
+		.color-גולן { background-color: #fbe9e7; color: #bf360c; } /* כתום אדמדם */
+		.color-חסון { background-color: #e0f2f1; color: #00838f; } /* טורקיז חזק */
+		.color-לישע { background-color: #f1f8e9; color: #558b2f; } /* ירוק זית */
+		.color-עידן_יניב { background-color: #eceff1; color: #37474f; } /* אפור כחול */
+		.color-חגי { background-color: #fff3e0; color: #e65100; } /* כתום דבש */
+		.color-סתיו { background-color: #e0f7fa; color: #00838f; } /* תכלת ימי */
+		.color-אסף { background-color: #ffebee; color: #c62828; } /* אדום בהיר */
+		.color-ליאני { background-color: #e3f2fd; color: #1565c0; } /* כחול כהה */
+		.color-נתי { background-color: #f9fbe7; color: #afb42b; } /* ירוק ליים */
+		.color-ערן { background-color: #e8eaf6; color: #3949ab; } /* כחול לבנדר */
+		.color-מאור { background-color: #fafafa; color: #212121; } /* אפור כהה (נייטרלי) */
+		.color-ניר { background-color: #efebe9; color: #4e342e; } /* חום קפה */
+		.color-חורחה { background-color: #fce4ec; color: #d81b60; } /* ורוד פוקסיה */
+		.color-שלומי { background-color: #e0f2f1; color: #004d40; } /* ירוק יער */
+		.color-יפתח { background-color: #f0f4c3; color: #827717; } /* ירוק חרדל */
+		.color-חברוני { background-color: #c8e6c9; color: #33691e; } /* ירוק דשא */
+		.color-ויקטור { background-color: #fff9c4; color: #f9a825; } /* צהוב זהב */
+		
 
         /* ** עיצוב תאי אזהרה ** */
         .needs-selection { background-color: #FFFDE7; border: 2px dashed #FFCA28; } 
@@ -392,14 +406,13 @@
 
         // מפת צבעים (רשימת העובדים הזמינים לסידור)
         const colorMap = {
-            'סתיו': 'color-סתיו', 'נתי': 'color-נתי', 'חסון': 'color-חסון', 'חורחה': 'color-חורחה',
-            'ערן': 'color-ערן', 'לישע': 'color-לישע', 'ליאני': 'color-ליאני', 'נמרוד': 'color-נמרוד',
-            'מאור': 'color-מאור', 'אסף': 'color-אסף', 'טגניה': 'color-טגניה', 'עידן יניב': 'color-עידן_יניב',
-            'גולן': 'color-גולן', 'שלומי': 'color-שלומי', 'יובי': 'color-יובי', 'אמיר': 'color-אמיר',
-            'חברוני': 'color-חברוני', 'חגי': 'color-חגי', 'ישי': 'color-ישי', 'ניר': 'color-ניר',
-            'ויקטור': 'color-נתי', 
-            'יפתח': 'color-מאור' 
-        };
+            'אמיר': 'color-אמיר', 'נמרוד': 'color-נמרוד', 'יובי': 'color-יובי', 'טגניה': 'color-טגניה',
+            'ישי': 'color-ישי', 'גולן': 'color-גולן', 'חסון': 'color-חסון', 'לישע': 'color-לישע',
+            'עידן יניב': 'color-עידן_יניב', 'חגי': 'color-חגי', 'סתיו': 'color-סתיו', 'אסף': 'color-אסף',
+            'ליאני': 'color-ליאני', 'נתי': 'color-נתי', 'ערן': 'color-ערן', 'מאור': 'color-מאור',
+            'ניר': 'color-ניר', 'חורחה': 'color-חורחה', 'שלומי': 'color-שלומי', 'יפתח': 'color-יפתח',
+            'חברוני': 'color-חברוני', 'ויקטור': 'color-ויקטור',
+        };
 
         /**
          * פונקציה לאתחול הנתונים והצבת תאריך יום ראשון (היום הנוכחי)
@@ -843,7 +856,7 @@
                     </style>
                 </head>
                 <body>
-                    <h2>טבלת משמרות שבועית - משובצת וסופית (מעוצבת)</h2>
+                    <h2>טבלת משמרות שבועית - משובצת וסופית </h2>
                     <div id="results-container" style="max-width: 90%; margin: 20px auto;">
                         ${updatedTableHTML}
                     </div>
@@ -1168,70 +1181,78 @@
             }, 8000);
         }
 
-        // --- פונקציות עזר וקישורי כפתורים (נשארות כפי שהן) ---
+
+		
+		// --- פונקציות עזר וקישורי כפתורים (נשארות כפי שהן) ---
         
         function aggressiveClean(line) { return line.replace(/[\u0000-\u001F\u007F-\u009F\uFEFF\u00A0]/g, '').trim(); }
         
-        function downloadHtmlTable() { 
-            if (!lastRenderedTableHTML) {
-                alert('אין טבלת משמרות מנותחת! אנא הפעל את "סדר אוטומטי 🤖" או "נתח נתונים 🔍" תחילה.');
-                return;
-            }
-            const startDateString = document.getElementById('startDate').value;
-            if (!startDateString) {
-                alert('אנא בחר תאריך התחלה (יום ראשון) לפני הורדת הקובץ.');
-                return;
-            }
-            const datesForWeek = getDatesForWeek(startDateString);
-            let updatedTableHTML = lastRenderedTableHTML;
-            let headerReplacement = '<tr><th>שעות / יום</th>';
-            EXPECTED_DAYS.forEach((day, index) => {
-                headerReplacement += `<th>${day}<span class="date-text">${datesForWeek[index]}</span></th>`;
-            });
-            headerReplacement += '</tr>';
-            const originalHeaderMatch = lastRenderedTableHTML.match(/<thead>(.*?)<\/thead>/s);
-            if (originalHeaderMatch) {
-                const originalHeaderContent = originalHeaderMatch[1];
-                const newHeaderContent = originalHeaderContent.replace(/<tr>(.*?)<\/tr>/s, headerReplacement);
-                updatedTableHTML = lastRenderedTableHTML.replace(originalHeaderMatch[0], `<thead>${newHeaderContent}</thead>`);
-            }
-            const style = document.querySelector('style').textContent;
-            const cleanHTMLContent = `
-                <!DOCTYPE html>
-                <html lang="he" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>טבלת משמרות שבועית - מעוצבת</title>
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; direction: rtl; background-color: #f7f9fb; color: #333; }
-                        h2 { color: var(--primary-blue); padding-bottom: 15px; margin-bottom: 30px; }
-                        ${style}
-                        #input-section-wrapper, #button-group, #autoScheduleButton, #resetButton { display: none !important; }
-                    </style>
-                </head>
-                <body>
-                    <h2>טבלת משמרות שבועית - משובצת וסופית (מעוצבת)</h2>
-                    <div id="results-container" style="max-width: 90%; margin: 20px auto;">
-                        ${updatedTableHTML}
-                    </div>
-                    <p style="text-align: center; color: #777; margin-top: 30px;">דף זה נוצר אוטומטית על ידי מנתח המשמרות.</p>
-                </body>
-                </html>
-            `;
-            const bom = '\ufeff'; 
-            const blob = new Blob([bom + cleanHTMLContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `schedule_table_${startDateString}_maor.html`;
-            link.click(); 
-            URL.revokeObjectURL(url);
-            const msg = document.getElementById('link-message');
-            msg.querySelector('p').textContent = '✅ קובץ HTML הורד למחשבך!';
-            msg.style.backgroundColor = '#4CAF50';
-            setTimeout(() => { msg.style.display = 'none'; msg.style.backgroundColor = '#4CAF50'; }, 3000);
-        }
+						/**
+		 * פונקציה חדשה להורדת נתוני הקלט (או הפלט המשובץ) כקובץ CSV
+		 */
+	/**
+	 * פונקציה חדשה להורדת הנתונים המנותחים (טבלת המשמרות הסופית) כקובץ CSV.
+	 * כולל תיקון "sep=\t" לפתרון בעיות יישור באקסל (אופיס/עברית).
+	 */
+			function downloadCsvFile() {
+			const textContent = document.getElementById('dataToAnalyze').value;
+			const startDateString = document.getElementById('startDate').value;
+			const parsedData = parseVerticalText(textContent); // מנתח את הנתונים הנוכחיים
+
+			if (parsedData.error || !textContent.trim()) {
+				alert('❌ לא נמצאו נתונים תקינים או שאין נתונים כלל. נתח/סדר אוטומטי תחילה.');
+				return;
+			}
+
+			const { days: dayHeaders, data: scheduleData } = parsedData;
+			const datesForWeek = getDatesForWeek(startDateString);
+			
+			// יצירת כותרת ה-CSV: שעות | יום א' (תאריך) | יום ב' (תאריך) | ...
+			let csvHeaders = ['שעות / יום'];
+			dayHeaders.forEach((day, index) => {
+				csvHeaders.push(`${day} (${datesForWeek[index]})`);
+			});
+			
+			// *** זהו התיקון העיקרי - הוספת "sep=\t" לטובת אקסל ***
+			let csvContent = "sep=\t\n" + csvHeaders.join('\t') + '\n';
+			
+			// יצירת שורות הנתונים
+			scheduleData.forEach((row, rowIndex) => {
+				const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
+				const timeSlotDisplay = timeSlotFull.split('(')[0].trim();
+				
+				let csvRow = [timeSlotDisplay];
+				
+				row.forEach(cellContent => {
+					// הופך את הנתונים המשובצים למחרוזת אחת מופרדת בפסיקים
+					const names = cellContent.split(',').filter(name => name.trim().length > 0);
+					csvRow.push(names.join(', '));
+				});
+				
+				csvContent += csvRow.join('\t') + '\n';
+			});
+
+			const bom = '\ufeff'; // הוספת BOM לטיפול נכון בעברית
+			const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+
+			link.href = url;
+			link.download = `schedule_table_analyzed_${startDateString}.csv`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+
+			URL.revokeObjectURL(url);
+			
+			const msg = document.getElementById('link-message');
+			msg.querySelector('p').textContent = '✅ קובץ CSV מנותח הורד בהצלחה!';
+			msg.style.backgroundColor = '#546E7A'; 
+			msg.style.display = 'block';
+			setTimeout(() => { msg.style.display = 'none'; }, 3000);
+		}
+		
+
 
         async function fetchFromGoogleSheet() {
             const url = document.getElementById('googleSheetUrl').value;
@@ -1284,6 +1305,8 @@
             const textContent = document.getElementById('dataToAnalyze').value;
             renderSchedule(parseVerticalText(textContent));
         });
+		
+		document.getElementById('downloadButton').addEventListener('click', downloadCsvFile);
 
         document.getElementById('resetButton').addEventListener('click', () => {
              document.getElementById('dataToAnalyze').value = '';
@@ -1295,6 +1318,7 @@
         document.getElementById('generateLinkButton').addEventListener('click', downloadHtmlTable);
         document.getElementById('autoScheduleButton').addEventListener('click', autoSchedule);
         document.getElementById('fetchFromSheetButton').addEventListener('click', fetchFromGoogleSheet);
+		
     
     </script>
 </body>
