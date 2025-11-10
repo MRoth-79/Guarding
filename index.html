@@ -160,7 +160,7 @@
 			text-align: center;
 			min-width: 150px;
 			height: 80px;  
-			vertical-align: middle;		
+			vertical-align: middle;
 			font-size: 20px; 
 		}
 
@@ -196,18 +196,18 @@
 		
 
         /* ** עיצוב שמות העובדים (Tag/Pill) ** */
-		.person {
-			display: inline-block;
-			padding: 3px 8px; /* הקטנו ריפוד */
-			margin: 1px; /* הקטנו מרווח */
-			border-radius: 20px;
-			font-size: 25px; 
-			font-weight: 600;
-			cursor: help;
-			transition: all 0.2s;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-			text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.25);
-		}
+        .person {
+            display: inline-block;
+            padding: 4px 10px;
+            margin: 3px 1px;
+            border-radius: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: help;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.25);
+        }
         
         .person:hover {
             transform: scale(1.05);
@@ -247,16 +247,18 @@
         }
 		.warning-text {
 			color: var(--accent-red);
-			display: block; 
+			/* display: block;  
 			font-size: 13px; 
 			line-height: 1.3; 
 		}
-		
+
+
 		/* **חדש: עיצוב משמרת מבוטלת** */
         .disabled-shift {
             background-color: #ECEFF1 !important;
             border: 1px dashed #B0BEC5;
         }
+
 
         /* ** עיצוב טבלת הסיכום - מודרנית ** */
         #summary-table {
@@ -340,7 +342,7 @@
             
             <p class="file-format-info">
                 הנתונים שהוזנו כאן ישמשו לניתוח. **הסידור האוטומטי יתחשב רק בעובדים שרשמתם כאופציה לכל משבצת!**
-                
+                <br>
                 **הערה חשובה:** משבצת 'ליווי 07:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
                 <br>
                 **אילוץ חמור:** לאחר משמרת 22:00-02:00 יש חסימה עד 14:00 למחרת. לאחר 02:00-06:00 יש חסימה עד 18:00 באותו יום.
@@ -349,9 +351,10 @@
                 title="נתוני משמרות לעריכה וניתוח"
                 placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
             </p>
-            </textarea>
-            
+            </textarea>
+            
 			<hr style="margin: 20px 0;">
+
 			<h3>סימון "לווין" (החרגה מסידור) 🛰️</h3>
 			<p class="file-format-info">
 				סמן כאן שומרים שביצעו "לווין".
@@ -366,7 +369,8 @@
 				סמן ימים שבהם משמרת "ליווי 07:40" <b>אינה</b> נדרשת.
 			</p>
 			<div id="holidayChecklist" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f4f7; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px;">
-				</div>	
+				</div>
+
 			<hr style="margin: 20px 0;">
 			<h3>משיכת נתונים מ-Google Sheet Web App ☁️</h3>
 			<p class="file-format-info">
@@ -466,13 +470,13 @@
             document.getElementById('startDate').value = formattedDate;
 
             const savedUrl = localStorage.getItem('googleSheetUrl');
-            if (savedUrl) {
-                document.getElementById('googleSheetUrl').value = savedUrl;
-            }
-			generateGuardsChecklist();
-			generateHolidayChecklist();
-        }
+			if (savedUrl) {
+                document.getElementById('googleSheetUrl').value = savedUrl;
+            }
 
+			generateGuardsChecklist();
+			generateHolidayChecklist();			
+        }
 
 		/**
          * פונקציה חדשה: יצירת צ'קליסט השומרים
@@ -480,16 +484,15 @@
         function generateGuardsChecklist() {
             const container = document.getElementById('guardsChecklist');
             if (!container) return;
-            
-            // Get guards from colorMap. We need to handle keys like 'עידן_יניב'
+            
+            // קבלת השומרים ממפת הצבעים
             const guardNames = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
-            
-            // Sort names alphabetically
+            
+            // מיון שמות א'-ב'
             guardNames.sort((a, b) => a.localeCompare(b, 'he'));
 
             let html = '';
             guardNames.forEach(name => {
-                // Use a consistent ID for the checkbox, e.g., 'check-גולן'
                 const checkId = `check-${name.replace(' ', '_')}`;
                 html += `
                     <div style="display: flex; align-items: center; min-width: 120px;">
@@ -501,24 +504,18 @@
             container.innerHTML = html;
         }
 
-/**
- * פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי) - *** עם תיקון רוחב אחיד ***
- */
+		/**
+		* פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי)
+		*/
 		function generateHolidayChecklist() {
 			const container = document.getElementById('holidayChecklist');
 			if (!container) return;
 
 			let html = '';
-			// Use the existing EXPECTED_DAYS constant
 			EXPECTED_DAYS.forEach((day, index) => {
 				const checkId = `check-holiday-${index}`;
 				// יום שבת (index 6) מושבת כברירת מחדל
 				const isDisabled = (index === 6); 
-				
-				// --- התיקון כאן ---
-				// 1. קבענו 'width: 120px' (במקום min-width) לרוחב אחיד
-				// 2. ה-label (טקסט) מופיע לפני ה-input (תיבה) ליישור לימין (RTL)
-				// 3. 'justify-content: space-between' מיישר את הטקסט לימין ואת התיבה לשמאל
 				
 				html += `
 					<div style="display: flex; align-items: center; justify-content: space-between; width: 120px; box-sizing: border-box;">
@@ -532,6 +529,8 @@
 			container.innerHTML = html;
 		}
 
+		        /**
+         * פונקציה שמקבלת תאריך התחלה...
 
         /**
          * פונקציה שמקבלת תאריך התחלה ומחזירה מערך תאריכים לשבוע.
@@ -633,296 +632,291 @@
         /**
          * פונקציה לבניית הטבלה וביצוע הניתוח - כולל הצגת תאריכים
          */
-        /**
-         * פונקציה לבניית הטבלה וביצוע הניתוח - כולל הצגת תאריכים
-         * *** גרסה מעודכנת עם תצוגת "אין ליווי" ***
-         */
-        function renderSchedule(parsedData) {
-            const resultsContainer = document.getElementById('results-container');
-            const startDateString = document.getElementById('startDate').value;
+        function renderSchedule(parsedData) {
+            const resultsContainer = document.getElementById('results-container');
+            const startDateString = document.getElementById('startDate').value;
 
-            if (parsedData.error) {
-                resultsContainer.innerHTML = `<p class="warning-text">❌ שגיאת נתונים: ${parsedData.error}</p>`;
-                return;
-            }
-            
-            if (!startDateString) {
-                 resultsContainer.innerHTML = `<p class="warning-text">❌ אנא בחר תאריך התחלה (יום ראשון) לפני הניתוח.</p>`;
-                return;
-            }
+            if (parsedData.error) {
+                resultsContainer.innerHTML = `<p class="warning-text">❌ שגיאת נתונים: ${parsedData.error}</p>`;
+                return;
+            }
+            
+            if (!startDateString) {
+                 resultsContainer.innerHTML = `<p class="warning-text">❌ אנא בחר תאריך התחלה (יום ראשון) לפני הניתוח.</p>`;
+                return;
+            }
 
-            const datesForWeek = getDatesForWeek(startDateString);
-            const { days: dayHeaders, data: scheduleData } = parsedData;
+            const datesForWeek = getDatesForWeek(startDateString);
+            const { days: dayHeaders, data: scheduleData } = parsedData;
 
-            // *** הוספה חדשה: קריאת ימי חופש ליווי ***
             const holidaySet = new Set();
             const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
             holidayCheckboxes.forEach(cb => {
                 holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
             });
-            // *** סוף הוספה ***
 
-            // **1. יצירת HTML עבור הטבלה המנותחת**
-            let tableHTML = '<h3>טבלת משמרות מנותחת</h3>';
-            
-            tableHTML += `<p class="file-format-info" style="text-align: center; color: var(--primary-blue);">**הגדרות:** משמרת יום (06:00-22:00): 1 עובד. משמרת לילה (02:00-06:00, 22:00-02:00): עד 2 עובדים. **מינימום שבועי: ${MIN_REQUIRED} משמרות (לא כולל ליווי).**</p>`;
+            // **1. יצירת HTML עבור הטבלה המנותחת**
+            let tableHTML = '<h3>טבלת משמרות מנותחת</h3>';
+            
+            tableHTML += `<p class="file-format-info" style="text-align: center; color: var(--primary-blue);">**הגדרות:** משמרת יום (06:00-22:00): 1 עובד. משמרת לילה (02:00-06:00, 22:00-02:00): עד 2 עובדים. **מינימום שבועי: ${MIN_REQUIRED} משמרות (לא כולל ליווי).**</p>`;
 
-            // יצירת טבלת הנתונים הראשית
-            let scheduleTableHTML = '<table id="schedule-table"><thead><tr><th>שעות / יום</th>';
-            
-            // הוספת כותרות הימים כולל התאריכים
-            dayHeaders.forEach((day, index) => { 
-                scheduleTableHTML += `<th>${day}<span class="date-text">${datesForWeek[index]}</span></th>`; 
-            });
-            scheduleTableHTML += '</tr></thead><tbody>';
+            // יצירת טבלת הנתונים הראשית
+            let scheduleTableHTML = '<table id="schedule-table"><thead><tr><th>שעות / יום</th>';
+            
+            // הוספת כותרות הימים כולל התאריכים
+            dayHeaders.forEach((day, index) => { 
+                scheduleTableHTML += `<th>${day}<span class="date-text">${datesForWeek[index]}</span></th>`; 
+            });
+            scheduleTableHTML += '</tr></thead><tbody>';
 
-            
-            const allShifts = {};
-            const nightShift2to6Count = {}; 
-            const dailyCheck = {};
-            
-            scheduleData.forEach((row, rowIndex) => {
-                const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
-                const isNightShift = timeSlotFull.includes('(Night)');
-                const isAssistanceShift = timeSlotFull.includes('(Assist)'); 
-                const isNight2to6 = rowIndex === NIGHT_SHIFT_2_6_INDEX;
-                const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
-                
-                const maxAllowedInShift = isNightShift ? 2 : 1; 
-                
-                const rowClass = isAssistanceShift ? 'red-assistance-shift' : '';
-                
-                scheduleTableHTML += `<tr class="${rowClass}"><td class="time-slot">${timeSlotDisplay}</td>`;
+            
+            const allShifts = {};
+            const nightShift2to6Count = {}; 
+            const dailyCheck = {};
+            
+            scheduleData.forEach((row, rowIndex) => {
+                const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
+                const isNightShift = timeSlotFull.includes('(Night)');
+                const isAssistanceShift = timeSlotFull.includes('(Assist)'); 
+                const isNight2to6 = rowIndex === NIGHT_SHIFT_2_6_INDEX;
+                const timeSlotDisplay = timeSlotFull.replace(' (Night)', '').replace(' (Assist)', '');
+                
+                const maxAllowedInShift = isNightShift ? 2 : 1; 
+                
+                const rowClass = isAssistanceShift ? 'red-assistance-shift' : '';
+                
+                scheduleTableHTML += `<tr class="${rowClass}"><td class="time-slot">${timeSlotDisplay}</td>`;
 
-                row.forEach((cellContent, colIndex) => {
-                    const day = dayHeaders[colIndex];
-                    const names = cellContent.split(',').filter(name => name.trim().length > 0);
-                    const numNames = names.length;
-                    
-                    if (!dailyCheck[day]) { dailyCheck[day] = new Set(); }
-                    
-                    let dailyDuplicateFound = false;
-                    let consecutiveShiftViolation = false; 
-                    
-                    // *** שינוי כאן: איסוף שמות רגיל ***
-                    if (!(isAssistanceShift && holidaySet.has(colIndex))) {
-                        names.forEach(name => {
-                            const cleanedName = name.trim();
-                            
-                            // 1. בדיקת כפילות יומית (לא כולל ליווי 07:40)
-                            if (!isAssistanceShift && dailyCheck[day].has(cleanedName)) {
-                                dailyDuplicateFound = true;
-                            }
-                            
-                            // 2. בדיקת רצף משמרות (8 שעות מנוחה באותו יום)
-                            const prevShiftIndex = CONSECUTIVE_SHIFT_CHECK[rowIndex];
-                            if (prevShiftIndex !== undefined) {
-                                const prevShiftNames = scheduleData[prevShiftIndex][colIndex].split(',').map(n => n.trim()).filter(n => n.length > 0);
-                                if (prevShiftNames.includes(cleanedName)) {
-                                    consecutiveShiftViolation = true; 
-                                }
-                            }
-                            
-                            if (cleanedName) { 
-                                dailyCheck[day].add(cleanedName);
-                                
-                                // 3. איסוף כללי לתדירות שבועית (*** רק משמרות לא-ליווי ***)
-                                if (!isAssistanceShift) { 
-                                    allShifts[cleanedName] = (allShifts[cleanedName] || 0) + 1;
-                                }
+                row.forEach((cellContent, colIndex) => {
+                    const day = dayHeaders[colIndex];
+                    const names = cellContent.split(',').filter(name => name.trim().length > 0);
+                    const numNames = names.length;
+                    
+                    if (!dailyCheck[day]) { dailyCheck[day] = new Set(); }
+                    
+                    let dailyDuplicateFound = false;
+                    let consecutiveShiftViolation = false; 
+                    
+                    names.forEach(name => {
+                        const cleanedName = name.trim();
+                        
+                        // 1. בדיקת כפילות יומית (לא כולל ליווי 07:40)
+                        if (!isAssistanceShift && dailyCheck[day].has(cleanedName)) {
+                            dailyDuplicateFound = true;
+                        }
+                        
+                        // 2. בדיקת רצף משמרות (8 שעות מנוחה באותו יום)
+                        const prevShiftIndex = CONSECUTIVE_SHIFT_CHECK[rowIndex];
+                        if (prevShiftIndex !== undefined) {
+                            const prevShiftNames = scheduleData[prevShiftIndex][colIndex].split(',').map(n => n.trim()).filter(n => n.length > 0);
+                            if (prevShiftNames.includes(cleanedName)) {
+                                consecutiveShiftViolation = true; 
+                            }
+                        }
+                        
 
-                                // 4. **איסוף לתדירות משמרת 02:00-06:00**
-                                if (isNight2to6) {
-                                    nightShift2to6Count[cleanedName] = (nightShift2to6Count[cleanedName] || 0) + 1;
-                                }
-                            }
-                        });
-                    }
-                    
-                    // --- בדיקות אכיפת מנוחת לילה חמורות (חדש) ---
-                    let nightRestViolation = false; // 22-02 אתמול -> 06-10 / 10-14 היום
-                    let sameDayNightBlockViolation = false; // 02-06 היום -> 06-10 / 10-14 / 14-18 היום
-                    let consecutiveNightViolation = false; // 22-02 אתמול -> 02-06 היום
+                        if (cleanedName) { 
+                            dailyCheck[day].add(cleanedName);
+                            
+                            // 3. איסוף כללי לתדירות שבועית (*** רק משמרות לא-ליווי ***)
+                            if (!isAssistanceShift) { 
+                                allShifts[cleanedName] = (allShifts[cleanedName] || 0) + 1;
+                            }
 
-                    // 5.1 Check 22:00-02:00 (Previous Night) to Day (Next Day Block until 14:00)
-                    if (colIndex > 0 && (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX)) { 
-                        const prevDayIndex = colIndex - 1;
-                        const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
-                        const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
+                            // 4. **איסוף לתדירות משמרת 02:00-06:00**
+                            if (isNight2to6) {
+                                nightShift2to6Count[cleanedName] = (nightShift2to6Count[cleanedName] || 0) + 1;
+                            }
+                        }
+                    });
+                    
+                    // --- בדיקות אכיפת מנוחת לילה חמורות (חדש) ---
+                    let nightRestViolation = false; // 22-02 אתמול -> 06-10 / 10-14 היום
+                    let sameDayNightBlockViolation = false; // 02-06 היום -> 06-10 / 10-14 / 14-18 היום
+                    let consecutiveNightViolation = false; // 22-02 אתמול -> 02-06 היום
 
-                        names.forEach(currentName => {
-                            if (prevNightNames.includes(currentName.trim())) { nightRestViolation = true; } 
-                        });
-                    }
+                    // 5.1 Check 22:00-02:00 (Previous Night) to Day (Next Day Block until 14:00)
+                    if (colIndex > 0 && (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX)) { 
+                        const prevDayIndex = colIndex - 1;
+                        const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
+                        const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
 
-                    // 5.2 Check 02:00-06:00 (Same Day) to Day (Same Day Block until 18:00)
-                    if (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX || rowIndex === AFTERNOON_SHIFT_14_18_INDEX) {
-                        const night02_06_shift_cell = scheduleData[NIGHT_SHIFT_02_06_INDEX][colIndex];
-                        const nightNames = night02_06_shift_cell.split(',').map(n => n.trim()).filter(n => n.length > 0);
-                        
-                        names.forEach(currentName => {
-                            if (nightNames.includes(currentName.trim())) { sameDayNightBlockViolation = true; }
-                        });
-                    }
-                    
-                    // 6. **בדיקת הפרת רצף לילות (22-02 אתמול -> 02-06 היום)**
-                    if (rowIndex === NIGHT_SHIFT_02_06_INDEX && colIndex > 0) {
-                        const prevDayIndex = colIndex - 1;
-                        const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
-                        const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
-                        names.forEach(currentName => {
-                            if (prevNightNames.includes(currentName.trim())) { consecutiveNightViolation = true; }
-                        });
-                    }
+                        names.forEach(currentName => {
+                            if (prevNightNames.includes(currentName.trim())) { nightRestViolation = true; } 
+                        });
+                    }
 
-                    // 7. **בדיקה נוספת: חריגה ממשמרת 02:00-06:00 (מכסה שבועית)**
-                    let night2to6LimitExceeded = false;
-                    if (isNight2to6) {
-                        names.forEach(name => {
-                            if ((nightShift2to6Count[name.trim()] || 0) > MAX_NIGHT_2_6) { night2to6LimitExceeded = true; }
-                        });
-                    }
-                    
+                    // 5.2 Check 02:00-06:00 (Same Day) to Day (Same Day Block until 18:00)
+                    if (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX || rowIndex === AFTERNOON_SHIFT_14_18_INDEX) {
+                        const night02_06_shift_cell = scheduleData[NIGHT_SHIFT_02_06_INDEX][colIndex];
+                        const nightNames = night02_06_shift_cell.split(',').map(n => n.trim()).filter(n => n.length > 0);
+                        
+                        names.forEach(currentName => {
+                            if (nightNames.includes(currentName.trim())) { sameDayNightBlockViolation = true; }
+                        });
+                    }
+                    
+                    // 6. **בדיקת הפרת רצף לילות (22-02 אתמול -> 02-06 היום)**
+                    if (rowIndex === NIGHT_SHIFT_02_06_INDEX && colIndex > 0) {
+                        const prevDayIndex = colIndex - 1;
+                        const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
+                        const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
+                        names.forEach(currentName => {
+                            if (prevNightNames.includes(currentName.trim())) { consecutiveNightViolation = true; }
+                        });
+                    }
 
-                    // --- קביעת מחלקת התא והאזהרה ---
-                    let cellClass = '';
-                    let warningText = '';
-                    let formattedNames = ''; // <-- *** שינוי: אתחול כריק ***
+                    // 7. **בדיקה נוספת: חריגה ממשמרת 02:00-06:00 (מכסה שבועית)**
+                    let night2to6LimitExceeded = false;
+                    if (isNight2to6) {
+                        names.forEach(name => {
+                            if ((nightShift2to6Count[name.trim()] || 0) > MAX_NIGHT_2_6) { night2to6LimitExceeded = true; }
+                        });
+                    }
+                    
 
-                    // *** התיקון כאן: בדיקה ראשונית של חסימת ליווי ***
+                    // --- קביעת מחלקת התא והאזהרה ---
+                    let cellClass = '';
+                    let warningText = '';
+					
+					let formattedNames = ''; // אתחול כריק
+
+                    // בדיקה ראשונית של חסימת ליווי
                     if (isAssistanceShift && holidaySet.has(colIndex)) {
                         cellClass = 'disabled-shift';
                         warningText = '<span style="color: #757575; font-weight: bold;">אין ליווי</span>';
                     } 
-                    // *** סוף התיקון (תחילת בלוק else) ***
-                    else {
-                        if (numNames === 0) {
-                            if (isAssistanceShift) {
-                                cellClass = '';
-                                warningText = '<span class="warning-text" style="color:#00838f;">משבצת ליווי ידנית</span>';
-                            } else {
-                                cellClass = 'needs-selection';
-                                warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
-                            }
-                        } else if (dailyDuplicateFound) {
-                            cellClass = 'daily-duplicate-warning';
-                            warningText = '<span class="warning-text">⚠️ כפילות יומית!</span>';
-                        } else if (sameDayNightBlockViolation) {
-                            cellClass = 'night-rest-violation-warning';
-                            warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 18:00)!</span>'; 
-                        } else if (nightRestViolation) { 
-                            cellClass = 'night-rest-violation-warning';
-                            warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 14:00)!</span>';
-                        } else if (consecutiveNightViolation) { 
-                            cellClass = 'night-rest-violation-warning';
-                            warningText = '<span class="warning-text">❌ רצף לילות אסור!</span>';
-                        } else if (consecutiveShiftViolation) { 
-                            cellClass = 'night-rest-violation-warning';
-                            warningText = '<span class="warning-text">❌ הפרת רצף (8 שעות מנוחה)!</span>';
-                        } else if (night2to6LimitExceeded) { 
-                            cellClass = 'night-shift-limit-warning';
-                            warningText = `<span class="warning-text">⚠️ חריגה! (מעל ${MAX_NIGHT_2_6} לילות 02-06)</span>`;
-                        } else if (numNames > maxAllowedInShift && numNames > 0) {
-                            cellClass = 'needs-selection'; 
-                            warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
-                        } else {
-                            // **שינוי כאן: קביעת קלאס לפי סוג המשמרת**
-                            if (isAssistanceShift) {
-                                cellClass = 'red-assistance-shift';
-                            } else {
-                                cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
-                            }
-                        }
+					else {
 
-                        // *** התיקון השני: הצג שמות רק אם המשמרת לא חסומה ***
-                        formattedNames = names.map(name => {
-                            const key = name.includes(' ') ? name.trim().replace(' ', '_') : name.trim();
-                            const className = colorMap[key] || 'person';
-                            return `<span class="person ${className}" title="${name} - ${day}, ${timeSlotDisplay}">${name}</span>`;
-                        }).join('');
-                    } // *** סוף בלוק ה-else החדש ***
+                    if (numNames === 0) {
+                        if (isAssistanceShift) {
+                            cellClass = '';
+                            warningText = '<span class="warning-text" style="color:#00838f;">משבצת ליווי ידנית</span>';
+                        } else {
+                            cellClass = 'needs-selection';
+                            warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
+                        }
+                    } else if (dailyDuplicateFound) {
+                        cellClass = 'daily-duplicate-warning';
+                        warningText = '<span class="warning-text">⚠️ כפילות יומית!</span>';
+                    } else if (sameDayNightBlockViolation) {
+                        cellClass = 'night-rest-violation-warning';
+                        warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 18:00)!</span>'; 
+                    } else if (nightRestViolation) { 
+                        cellClass = 'night-rest-violation-warning';
+                        warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 14:00)!</span>';
+                    } else if (consecutiveNightViolation) { 
+                        cellClass = 'night-rest-violation-warning';
+                        warningText = '<span class="warning-text">❌ רצף לילות אסור!</span>';
+                    } else if (consecutiveShiftViolation) { 
+                        cellClass = 'night-rest-violation-warning';
+                        warningText = '<span class="warning-text">❌ הפרת רצף (8 שעות מנוחה)!</span>';
+                    } else if (night2to6LimitExceeded) { 
+                        cellClass = 'night-shift-limit-warning';
+                        warningText = `<span class="warning-text">⚠️ חריגה! (מעל ${MAX_NIGHT_2_6} לילות 02-06)</span>`;
+                    } else if (numNames > maxAllowedInShift && numNames > 0) {
+                        // אם יש יותר עובדים ממה שנדרש, אנחנו מציגים אזהרה
+                       cellClass = 'needs-selection'; 
+                       warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
+                    } else {
+                        // **שינוי כאן: קביעת קלאס לפי סוג המשמרת**
+                        if (isAssistanceShift) {
+                            cellClass = 'red-assistance-shift';
+                        } else {
+                            cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
+                        }
+                    }
+					
+					formattedNames = names.map(name => {
 
-                    scheduleTableHTML += `<td data-day="${day}" data-time="${timeSlotDisplay}" class="${cellClass}">
-                        ${formattedNames} ${warningText}
-                    </td>`;
-                });
-                scheduleTableHTML += '</tr>';
-            });
-            scheduleTableHTML += '</tbody></table>';
-            
-            // **2. שמירת ה-HTML של הטבלה למשתנה גלובלי**
-            lastRenderedTableHTML = scheduleTableHTML; 
-            
-            // **3. המשך יצירת טבלת הסיכום והצגה**
-            tableHTML += scheduleTableHTML + '<hr>';
-            
+                        const key = name.includes(' ') ? name.trim().replace(' ', '_') : name.trim();
+                        const className = colorMap[key] || 'person';
+                        return `<span class="person ${className}" title="${name} - ${day}, ${timeSlotDisplay}">${name}</span>`;
+                    }).join('');
+					}
+
+                    scheduleTableHTML += `<td data-day="${day}" data-time="${timeSlotDisplay}" class="${cellClass}">
+                        ${formattedNames} ${warningText}
+                    </td>`;
+                });
+                scheduleTableHTML += '</tr>';
+            });
+            scheduleTableHTML += '</tbody></table>';
+            
+            // **2. שמירת ה-HTML של הטבלה למשתנה גלובלי**
+            lastRenderedTableHTML = scheduleTableHTML; 
+            
+            // **3. המשך יצירת טבלת הסיכום והצגה**
+            tableHTML += scheduleTableHTML + '<hr>';
+            
 //////////////////////////////////////////////////////////////////////////////////////////////
-            
-            // יצירת טבלת הסיכום
-            let summaryTableHTML = `<h3>סיכום תדירות הופעה של כל עובד (מינימום: ${MIN_REQUIRED}, מקסימום: ${MAX_ALLOWED}) - ללא משמרות ליווי</h3>`; 
-            summaryTableHTML += `
-                <table id="summary-table">
-                    <thead>
-                        <tr>
-                            <th>מס'</th>
-                            <th>שם העובד</th>
-                            <th>סך הופעות</th>
-                            <th>משמרות 02-06 (הגבלה: ${MAX_NIGHT_2_6})</th> 
-                            <th>עמידה בתנאי (${MIN_REQUIRED}-${MAX_ALLOWED})</th>
-                        </tr>
-                    </thead>
-                    <tbody id="summary-body">`;
-            
-            const sortedNames = Object.keys(allShifts).sort();
-            let counter = 1;
-            sortedNames.forEach(name => {
-                const count = allShifts[name];
-                const night2to6Count = nightShift2to6Count[name] || 0; // **הוספה: ספירת לילות 02-06**
-                
-                let rowClass = '';
-                let statusText = '';
-                let night2to6Status = night2to6Count > MAX_NIGHT_2_6 ? 
-                    `<span class="night-limit-fail">❌ ${night2to6Count}</span>` : 
-                    `<span class="night-limit-ok">✅ ${night2to6Count}</span>`;
+            
+            // יצירת טבלת הסיכום
+            let summaryTableHTML = `<h3>סיכום תדירות הופעה של כל עובד (מינימום: ${MIN_REQUIRED}, מקסימום: ${MAX_ALLOWED}) - ללא משמרות ליווי</h3>`; 
+            summaryTableHTML += `
+                <table id="summary-table">
+                    <thead>
+                        <tr>
+                            <th>מס'</th>
+                            <th>שם העובד</th>
+                            <th>סך הופעות</th>
+                            <th>משמרות 02-06 (הגבלה: ${MAX_NIGHT_2_6})</th> 
+                            <th>עמידה בתנאי (${MIN_REQUIRED}-${MAX_ALLOWED})</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-body">`;
+            
+            const sortedNames = Object.keys(allShifts).sort();
+            let counter = 1;
+            sortedNames.forEach(name => {
+                const count = allShifts[name];
+                const night2to6Count = nightShift2to6Count[name] || 0; // **הוספה: ספירת לילות 02-06**
+                
+                let rowClass = '';
+                let statusText = '';
+                let night2to6Status = night2to6Count > MAX_NIGHT_2_6 ? 
+                    `<span class="night-limit-fail">❌ ${night2to6Count}</span>` : 
+                    `<span class="night-limit-ok">✅ ${night2to6Count}</span>`;
 
 
-                // **בדיקת הטווח החדש (3-4)**
-                if (count >= MIN_REQUIRED && count <= MAX_ALLOWED) {
-                    rowClass = (count === MAX_ALLOWED) ? 'shifts-4-count' : 'shifts-3-count'; 
-                    statusText = `✅ עמד (${count} משמרות)`;
-                } else if (count < MIN_REQUIRED) {
-                    rowClass = 'low-shifts';
-                    statusText = `❌ **לא עמד (פחות מ-${MIN_REQUIRED} - ${count})**`;
-                } else if (count > MAX_ALLOWED) {
-                    rowClass = 'not-met-condition';
-                    statusText = `❌ לא עמד (יותר מדי - ${count})`;
-                } else {
-                    rowClass = 'not-met-condition'; 
-                    statusText = `❌ לא עמד (${count})`;
-                }
-                
-                // הוספת קלאס התראה גם אם חרגו ממשמרת הלילה הספציפית
-                if (night2to6Count > MAX_NIGHT_2_6) {
-                    rowClass += ' night-limit-fail-row';
-                }
+                // **בדיקת הטווח החדש (3-4)**
+                if (count >= MIN_REQUIRED && count <= MAX_ALLOWED) {
+                    rowClass = (count === MAX_ALLOWED) ? 'shifts-4-count' : 'shifts-3-count'; 
+                    statusText = `✅ עמד (${count} משמרות)`;
+                } else if (count < MIN_REQUIRED) {
+                    rowClass = 'low-shifts';
+                    statusText = `❌ **לא עמד (פחות מ-${MIN_REQUIRED} - ${count})**`;
+                } else if (count > MAX_ALLOWED) {
+                    rowClass = 'not-met-condition';
+                    statusText = `❌ לא עמד (יותר מדי - ${count})`;
+                } else {
+                    rowClass = 'not-met-condition'; 
+                    statusText = `❌ לא עמד (${count})`;
+                }
+                
+                // הוספת קלאס התראה גם אם חרגו ממשמרת הלילה הספציפית
+                if (night2to6Count > MAX_NIGHT_2_6) {
+                    rowClass += ' night-limit-fail-row';
+                }
 
-                summaryTableHTML += `
-                    <tr class="${rowClass}">
-                        <td style="text-align: center;">${counter++}</td>
-                        <td>${name}</td>
-                        <td style="text-align: center;">${count}</td>
-                        <td style="text-align: center;">${night2to6Status}</td> 
-                        <td style="text-align: center;">${statusText}</td>
-                    </tr>
-                `;
-            });
+                summaryTableHTML += `
+                    <tr class="${rowClass}">
+                        <td style="text-align: center;">${counter++}</td>
+                        <td>${name}</td>
+                        <td style="text-align: center;">${count}</td>
+                        <td style="text-align: center;">${night2to6Status}</td> 
+                        <td style="text-align: center;">${statusText}</td>
+                    </tr>
+                `;
+            });
 
-            summaryTableHTML += '</tbody></table>';
-            
-            tableHTML += summaryTableHTML;
+            summaryTableHTML += '</tbody></table>';
+            
+            tableHTML += summaryTableHTML;
 
-            resultsContainer.innerHTML = tableHTML;
-        }
+            resultsContainer.innerHTML = tableHTML;
+        }
+
 
         /**
          * פונקציה מעודכנת להורדת קובץ HTML שמכיל רק את הטבלה המעוצבת - כולל תאריכים
@@ -938,6 +932,17 @@
                 alert('אנא בחר תאריך התחלה (יום ראשון) לפני הורדת הקובץ.');
                 return;
             }
+			const excludedGuardsSet = new Set();
+            const checkboxes = document.querySelectorAll('#guardsChecklist input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => {
+                excludedGuardsSet.add(cb.value);
+            });
+
+            const holidaySet = new Set();
+            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
+            holidayCheckboxes.forEach(cb => {
+                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
+            });
 
             const datesForWeek = getDatesForWeek(startDateString);
             
@@ -1013,19 +1018,16 @@
                 return;
             }
 			
-			// **חדש: קריאת רשימת ה"לווין" (החרגה)**
-            const excludedGuardsSet = new Set();
+			const excludedGuardsSet = new Set();
             const checkboxes = document.querySelectorAll('#guardsChecklist input[type="checkbox"]:checked');
             checkboxes.forEach(cb => {
                 excludedGuardsSet.add(cb.value);
-
             });
 
-			// **חדש: קריאת ימים שבהם הליווי מבוטל**
-            const holidaySet = new Set();
+            const holidaySet = new Set(); 
             const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
             holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
+                holidaySet.add(parseInt(cb.value, 10)); 
             });
 
             const initialParsedData = parseVerticalText(textContent);
@@ -1037,7 +1039,8 @@
 
             const allEmployees = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
             let employeeShiftsCount = {}; 
-            let nightShift2to6Count = {}; 
+            let nightShift2to6Count = {};
+			let assistanceShiftsCount = {}; 
             let newScheduleData = initialParsedData.data.map(row => row.map(cell => [])); 
             let nightToMorningCheck = initialParsedData.days.map(() => new Set()); 
             let dailyOccupancy = initialParsedData.days.map(() => new Set()); 
@@ -1051,6 +1054,7 @@
                 allEmployees.forEach(name => {
                     employeeShiftsCount[name] = 0;
                     nightShift2to6Count[name] = 0;
+					assistanceShiftsCount[name] = 0;
                 });
                 
                 // איפוס סטים יומיים
@@ -1064,8 +1068,6 @@
                 let night02_06_block = initialParsedData.days.map(() => new Set()); 
 
                 const shiftsToFill = []; // המשבצות שצריך למלא באיטרציה זו
-				let assistanceShiftsDone = new Set(); // **חדש: מעקב אחרי משמרות ליווי**
-
 
                 // 2. איסוף נתוני זמינות והעתקת שיבוץ ידני
                 let mustStop = false;
@@ -1084,32 +1086,29 @@
                         availabilityMap[dayIndex][shiftIndex] = new Set(availableNames);
 
                         // שיבוץ ידני (אם הוכנסו) וספירת נתונים
-						if (iteration === 0) {
-                            // **תיקון: מנקה ליווי ביום חופש מסומן (כולל שבת)**
-                            // (משתמש ב-holidaySet שהוגדר בתחילת הפונקציה)
-                            const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+                        let namesInSlot = newScheduleData[shiftIndex][dayIndex];
 
-                            if (isBlockedAssistance) {
-                                namesInSlot = []; // מנקה את המשמרת החסומה
-                            // בודק אם השיבוץ הידני תקין (מספר אנשים נכון)
-                            } else if (availableNames.length === required && availableNames.length > 0) {
-                                namesInSlot = availableNames; // שומר שיבוץ ידני תקין
-                            } else {
-                                namesInSlot = []; // מנקה משבצת ריקה או לא תקינה
-                            }
-                            newScheduleData[shiftIndex][dayIndex] = namesInSlot;
+                        if (iteration === 0) {
+                        	const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+
+                        	if (isBlockedAssistance) {
+                            	namesInSlot = []; // מנקה משמרת חסומה
+                        	} else if (availableNames.length === required && availableNames.length > 0) {
+                        		namesInSlot = availableNames; // שומר שיבוץ ידני תקין
+                        	} else {
+                        		namesInSlot = []; // מנקה משבצת ריקה
+                        	}
+                    		newScheduleData[shiftIndex][dayIndex] = namesInSlot;
                         }
 
                         namesInSlot.forEach(name => {
                             if (allEmployees.includes(name)) {
-								// סופר את כל המשמרות, כולל ליווי
-                                employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
-
-								// **חדש: הוספת בדיקה ורישום ליווי ידני**
-                                if (isAssistanceShift) {
-                                    assistanceShiftsDone.add(name);
-                                }
-
+							if (isAssistanceShift) { 
+                                assistanceShiftsCount[name] = (assistanceShiftsCount[name] || 0) + 1;
+                            }
+                                if (!isAssistanceShift) { 
+                                    employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
+                                }
                                 if (isNight2to6) { nightShift2to6Count[name] = (nightShift2to6Count[name] || 0) + 1; }
                                 dailyOccupancy[dayIndex].add(name);
                                 
@@ -1133,14 +1132,12 @@
                             }
                         });
 
-						// אם המשבצת דורשת מילוי אוטומטי (כולל ליווי, לא כולל שבת)
-						// התנאי מונע שיבוץ רק אם זו משמרת ליווי בשבת
-						// **תיקון: מונע שיבוץ ליווי ביום חופש מסומן (כולל שבת)**
-                        const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
-    
-                        if ( !isBlockedAssistance && newScheduleData[shiftIndex][dayIndex].length < required) {
-                            shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
-                        }
+
+						// אם המשבצת דורשת מילוי אוטומטי
+						const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+						if ( !isBlockedAssistance && newScheduleData[shiftIndex][dayIndex].length < required) {
+							shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
+						}
                     });
                     if (mustStop) return;
                 });
@@ -1156,7 +1153,7 @@
                 let shiftsFilledThisIteration = 0;
                 
                 // 4. פונקציית ניקוד מורכבת
-                function scoreEmployee(name, count, dayIndex, shiftIndex) {
+                function scoreEmployee(name, count, dayIndex, shiftIndex) { 
                     let score = 0;
                     
                     // 1. ציון לפי תדירות כוללת: עדיפות למי ששמר פחות
@@ -1166,7 +1163,7 @@
                     if (count < MIN_REQUIRED) { 
                          score += 200 * (MIN_REQUIRED - count); 
                     }
-					
+
                     // --- עונשים קריטיים (מונעים שיבוץ) ---
                     
                     // 3. חסימה: כפילות יומית (בדיקה קלה) או רצף 8 שעות (בדיקה קלה)
@@ -1191,24 +1188,19 @@
                             score -= 600000; 
                         }
                     }
-
+					
 					// 6.5. חסימה: יותר ממשמרת ליווי אחת בשבוע
-                    if (shiftIndex === ASSIST_SHIFT_INDEX && assistanceShiftsDone.has(name)) {
+                    if (shiftIndex === ASSIST_SHIFT_INDEX && (assistanceShiftsCount[name] || 0) >= 1) {
                         score -= 5000000; // עונש כבד מאוד למניעת שיבוץ
                     }
 
                     // --- עונשים רגילים ---
-					
+
                     // 7. עונש על חריגה מהמקסימום (4)
                     if (count >= MAX_ALLOWED) {
                          score -= 5000; 
                     }
                     
-					// **חדש: עדכון מעקב ליווי לאחר שיבוץ אוטומטי**
-                     if (shiftIndex === ASSIST_SHIFT_INDEX) {
-                         assistanceShiftsDone.add(name);
-                     }
-					
                     // 8. אכיפת הגבלת משמרת לילה 02:00-06:00 (מכסה שבועית)
                     if (shiftIndex === NIGHT_SHIFT_2_6_INDEX) {
                         const currentNightCount = nightShift2to6Count[name] || 0;
@@ -1227,10 +1219,10 @@
                     const availableInSlot = Array.from(availabilityMap[dayIndex][shiftIndex]);
                     
                     const alreadyAssignedToSlot = new Set(newScheduleData[shiftIndex][dayIndex]);
-                    let filteredCandidates = availableInSlot.filter(name => !alreadyAssignedToSlot.has(name)); 
-
-                    // **חדש: החרגת אנשי "לווין" מהמועמדים**
-                    filteredCandidates = filteredCandidates.filter(name => !excludedGuardsSet.has(name)); 
+                    const filteredCandidates = availableInSlot.filter(name => 
+					!alreadyAssignedToSlot.has(name) && !excludedGuardsSet.has(name)
+					);
+					
 
                     let needed = requiredCount;
                     while (needed > 0) {
@@ -1256,8 +1248,14 @@
                             shiftsFilledThisIteration++; 
                             
                             // *** ספירה רק אם זו לא משמרת ליווי ***
-                            employeeShiftsCount[name]++;
-                            
+                            if (shiftIndex !== ASSIST_SHIFT_INDEX) {
+                                employeeShiftsCount[name]++;
+                            }
+							
+							if (shiftIndex === ASSIST_SHIFT_INDEX) {
+                                assistanceShiftsCount[name] = (assistanceShiftsCount[name] || 0) + 1;
+                            }
+
                             dailyOccupancy[dayIndex].add(name); 
                             
                             // *** עדכוני חסימות והפרות ***
@@ -1365,12 +1363,6 @@
 			}
 
 			const { days: dayHeaders, data: scheduleData } = parsedData;
-			// **חדש: קריאת ימים שבהם הליווי מבוטל (לצורך תצוגה)**
-            const holidaySet = new Set();
-            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
-            holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
-            });
 			const datesForWeek = getDatesForWeek(startDateString);
 			
 			// יצירת כותרת ה-CSV: שעות | יום א' (תאריך) | יום ב' (תאריך) | ...
