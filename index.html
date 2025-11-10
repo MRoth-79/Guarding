@@ -154,15 +154,13 @@
             background-color: white;
         }
 
-		#schedule-table th, #schedule-table td {
-			border: 1px solid var(--border-color);
-			padding: 8px; 
-			text-align: center;
-			min-width: 150px;
-			height: 80px;  
-			vertical-align: middle;
-			font-size: 20px; 
-		}
+        #schedule-table th, #schedule-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 8px;
+            text-align: center;
+            min-width: 145px;
+			font-size: 20px;
+        }
 
         #schedule-table thead {
             background-color: var(--primary-blue);
@@ -245,20 +243,15 @@
             background-color: #FFCDD2; 
             border: 2px dashed var(--accent-red);
         }
-		.warning-text {
-			color: var(--accent-red);
-			/* display: block;  
-			font-size: 13px; 
-			line-height: 1.3; 
-		}
-
-
+        .warning-text {
+            color: var(--accent-red);
+        }
+		
 		/* **חדש: עיצוב משמרת מבוטלת** */
         .disabled-shift {
             background-color: #ECEFF1 !important;
             border: 1px dashed #B0BEC5;
         }
-
 
         /* ** עיצוב טבלת הסיכום - מודרנית ** */
         #summary-table {
@@ -342,7 +335,7 @@
             
             <p class="file-format-info">
                 הנתונים שהוזנו כאן ישמשו לניתוח. **הסידור האוטומטי יתחשב רק בעובדים שרשמתם כאופציה לכל משבצת!**
-                <br>
+                
                 **הערה חשובה:** משבצת 'ליווי 07:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
                 <br>
                 **אילוץ חמור:** לאחר משמרת 22:00-02:00 יש חסימה עד 14:00 למחרת. לאחר 02:00-06:00 יש חסימה עד 18:00 באותו יום.
@@ -351,10 +344,9 @@
                 title="נתוני משמרות לעריכה וניתוח"
                 placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
             </p>
-            </textarea>
-            
+            </textarea>
+            
 			<hr style="margin: 20px 0;">
-
 			<h3>סימון "לווין" (החרגה מסידור) 🛰️</h3>
 			<p class="file-format-info">
 				סמן כאן שומרים שביצעו "לווין".
@@ -369,8 +361,7 @@
 				סמן ימים שבהם משמרת "ליווי 07:40" <b>אינה</b> נדרשת.
 			</p>
 			<div id="holidayChecklist" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f4f7; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px;">
-				</div>
-
+				</div>	
 			<hr style="margin: 20px 0;">
 			<h3>משיכת נתונים מ-Google Sheet Web App ☁️</h3>
 			<p class="file-format-info">
@@ -470,13 +461,13 @@
             document.getElementById('startDate').value = formattedDate;
 
             const savedUrl = localStorage.getItem('googleSheetUrl');
-			if (savedUrl) {
-                document.getElementById('googleSheetUrl').value = savedUrl;
-            }
-
+            if (savedUrl) {
+                document.getElementById('googleSheetUrl').value = savedUrl;
+            }
 			generateGuardsChecklist();
-			generateHolidayChecklist();			
-        }
+			generateHolidayChecklist();
+        }
+
 
 		/**
          * פונקציה חדשה: יצירת צ'קליסט השומרים
@@ -484,15 +475,16 @@
         function generateGuardsChecklist() {
             const container = document.getElementById('guardsChecklist');
             if (!container) return;
-            
-            // קבלת השומרים ממפת הצבעים
+            
+            // Get guards from colorMap. We need to handle keys like 'עידן_יניב'
             const guardNames = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
-            
-            // מיון שמות א'-ב'
+            
+            // Sort names alphabetically
             guardNames.sort((a, b) => a.localeCompare(b, 'he'));
 
             let html = '';
             guardNames.forEach(name => {
+                // Use a consistent ID for the checkbox, e.g., 'check-גולן'
                 const checkId = `check-${name.replace(' ', '_')}`;
                 html += `
                     <div style="display: flex; align-items: center; min-width: 120px;">
@@ -504,18 +496,24 @@
             container.innerHTML = html;
         }
 
-		/**
-		* פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי)
-		*/
+/**
+ * פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי) - *** עם תיקון רוחב אחיד ***
+ */
 		function generateHolidayChecklist() {
 			const container = document.getElementById('holidayChecklist');
 			if (!container) return;
 
 			let html = '';
+			// Use the existing EXPECTED_DAYS constant
 			EXPECTED_DAYS.forEach((day, index) => {
 				const checkId = `check-holiday-${index}`;
 				// יום שבת (index 6) מושבת כברירת מחדל
 				const isDisabled = (index === 6); 
+				
+				// --- התיקון כאן ---
+				// 1. קבענו 'width: 120px' (במקום min-width) לרוחב אחיד
+				// 2. ה-label (טקסט) מופיע לפני ה-input (תיבה) ליישור לימין (RTL)
+				// 3. 'justify-content: space-between' מיישר את הטקסט לימין ואת התיבה לשמאל
 				
 				html += `
 					<div style="display: flex; align-items: center; justify-content: space-between; width: 120px; box-sizing: border-box;">
@@ -529,8 +527,6 @@
 			container.innerHTML = html;
 		}
 
-		        /**
-         * פונקציה שמקבלת תאריך התחלה...
 
         /**
          * פונקציה שמקבלת תאריך התחלה ומחזירה מערך תאריכים לשבוע.
@@ -648,12 +644,6 @@
 
             const datesForWeek = getDatesForWeek(startDateString);
             const { days: dayHeaders, data: scheduleData } = parsedData;
-
-            const holidaySet = new Set();
-            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
-            holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
-            });
 
             // **1. יצירת HTML עבור הטבלה המנותחת**
             let tableHTML = '<h3>טבלת משמרות מנותחת</h3>';
@@ -778,15 +768,6 @@
                     // --- קביעת מחלקת התא והאזהרה ---
                     let cellClass = '';
                     let warningText = '';
-					
-					let formattedNames = ''; // אתחול כריק
-
-                    // בדיקה ראשונית של חסימת ליווי
-                    if (isAssistanceShift && holidaySet.has(colIndex)) {
-                        cellClass = 'disabled-shift';
-                        warningText = '<span style="color: #757575; font-weight: bold;">אין ליווי</span>';
-                    } 
-					else {
 
                     if (numNames === 0) {
                         if (isAssistanceShift) {
@@ -826,14 +807,12 @@
                             cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
                         }
                     }
-					
-					formattedNames = names.map(name => {
 
+                    const formattedNames = names.map(name => {
                         const key = name.includes(' ') ? name.trim().replace(' ', '_') : name.trim();
                         const className = colorMap[key] || 'person';
                         return `<span class="person ${className}" title="${name} - ${day}, ${timeSlotDisplay}">${name}</span>`;
                     }).join('');
-					}
 
                     scheduleTableHTML += `<td data-day="${day}" data-time="${timeSlotDisplay}" class="${cellClass}">
                         ${formattedNames} ${warningText}
@@ -932,17 +911,6 @@
                 alert('אנא בחר תאריך התחלה (יום ראשון) לפני הורדת הקובץ.');
                 return;
             }
-			const excludedGuardsSet = new Set();
-            const checkboxes = document.querySelectorAll('#guardsChecklist input[type="checkbox"]:checked');
-            checkboxes.forEach(cb => {
-                excludedGuardsSet.add(cb.value);
-            });
-
-            const holidaySet = new Set();
-            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
-            holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
-            });
 
             const datesForWeek = getDatesForWeek(startDateString);
             
@@ -1018,16 +986,19 @@
                 return;
             }
 			
-			const excludedGuardsSet = new Set();
+			// **חדש: קריאת רשימת ה"לווין" (החרגה)**
+            const excludedGuardsSet = new Set();
             const checkboxes = document.querySelectorAll('#guardsChecklist input[type="checkbox"]:checked');
             checkboxes.forEach(cb => {
                 excludedGuardsSet.add(cb.value);
+
             });
 
-            const holidaySet = new Set(); 
+			// **חדש: קריאת ימים שבהם הליווי מבוטל**
+            const holidaySet = new Set();
             const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
             holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); 
+                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
             });
 
             const initialParsedData = parseVerticalText(textContent);
@@ -1039,8 +1010,7 @@
 
             const allEmployees = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
             let employeeShiftsCount = {}; 
-            let nightShift2to6Count = {};
-			let assistanceShiftsCount = {}; 
+            let nightShift2to6Count = {}; 
             let newScheduleData = initialParsedData.data.map(row => row.map(cell => [])); 
             let nightToMorningCheck = initialParsedData.days.map(() => new Set()); 
             let dailyOccupancy = initialParsedData.days.map(() => new Set()); 
@@ -1054,7 +1024,6 @@
                 allEmployees.forEach(name => {
                     employeeShiftsCount[name] = 0;
                     nightShift2to6Count[name] = 0;
-					assistanceShiftsCount[name] = 0;
                 });
                 
                 // איפוס סטים יומיים
@@ -1068,6 +1037,8 @@
                 let night02_06_block = initialParsedData.days.map(() => new Set()); 
 
                 const shiftsToFill = []; // המשבצות שצריך למלא באיטרציה זו
+				let assistanceShiftsDone = new Set(); // **חדש: מעקב אחרי משמרות ליווי**
+
 
                 // 2. איסוף נתוני זמינות והעתקת שיבוץ ידני
                 let mustStop = false;
@@ -1086,29 +1057,32 @@
                         availabilityMap[dayIndex][shiftIndex] = new Set(availableNames);
 
                         // שיבוץ ידני (אם הוכנסו) וספירת נתונים
-                        let namesInSlot = newScheduleData[shiftIndex][dayIndex];
+						if (iteration === 0) {
+                            // **תיקון: מנקה ליווי ביום חופש מסומן (כולל שבת)**
+                            // (משתמש ב-holidaySet שהוגדר בתחילת הפונקציה)
+                            const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
 
-                        if (iteration === 0) {
-                        	const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
-
-                        	if (isBlockedAssistance) {
-                            	namesInSlot = []; // מנקה משמרת חסומה
-                        	} else if (availableNames.length === required && availableNames.length > 0) {
-                        		namesInSlot = availableNames; // שומר שיבוץ ידני תקין
-                        	} else {
-                        		namesInSlot = []; // מנקה משבצת ריקה
-                        	}
-                    		newScheduleData[shiftIndex][dayIndex] = namesInSlot;
+                            if (isBlockedAssistance) {
+                                namesInSlot = []; // מנקה את המשמרת החסומה
+                            // בודק אם השיבוץ הידני תקין (מספר אנשים נכון)
+                            } else if (availableNames.length === required && availableNames.length > 0) {
+                                namesInSlot = availableNames; // שומר שיבוץ ידני תקין
+                            } else {
+                                namesInSlot = []; // מנקה משבצת ריקה או לא תקינה
+                            }
+                            newScheduleData[shiftIndex][dayIndex] = namesInSlot;
                         }
 
                         namesInSlot.forEach(name => {
                             if (allEmployees.includes(name)) {
-							if (isAssistanceShift) { 
-                                assistanceShiftsCount[name] = (assistanceShiftsCount[name] || 0) + 1;
-                            }
-                                if (!isAssistanceShift) { 
-                                    employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
-                                }
+								// סופר את כל המשמרות, כולל ליווי
+                                employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
+
+								// **חדש: הוספת בדיקה ורישום ליווי ידני**
+                                if (isAssistanceShift) {
+                                    assistanceShiftsDone.add(name);
+                                }
+
                                 if (isNight2to6) { nightShift2to6Count[name] = (nightShift2to6Count[name] || 0) + 1; }
                                 dailyOccupancy[dayIndex].add(name);
                                 
@@ -1132,12 +1106,14 @@
                             }
                         });
 
-
-						// אם המשבצת דורשת מילוי אוטומטי
-						const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
-						if ( !isBlockedAssistance && newScheduleData[shiftIndex][dayIndex].length < required) {
-							shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
-						}
+						// אם המשבצת דורשת מילוי אוטומטי (כולל ליווי, לא כולל שבת)
+						// התנאי מונע שיבוץ רק אם זו משמרת ליווי בשבת
+						// **תיקון: מונע שיבוץ ליווי ביום חופש מסומן (כולל שבת)**
+                        const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+    
+                        if ( !isBlockedAssistance && newScheduleData[shiftIndex][dayIndex].length < required) {
+                            shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
+                        }
                     });
                     if (mustStop) return;
                 });
@@ -1153,7 +1129,7 @@
                 let shiftsFilledThisIteration = 0;
                 
                 // 4. פונקציית ניקוד מורכבת
-                function scoreEmployee(name, count, dayIndex, shiftIndex) { 
+                function scoreEmployee(name, count, dayIndex, shiftIndex) {
                     let score = 0;
                     
                     // 1. ציון לפי תדירות כוללת: עדיפות למי ששמר פחות
@@ -1163,7 +1139,7 @@
                     if (count < MIN_REQUIRED) { 
                          score += 200 * (MIN_REQUIRED - count); 
                     }
-
+					
                     // --- עונשים קריטיים (מונעים שיבוץ) ---
                     
                     // 3. חסימה: כפילות יומית (בדיקה קלה) או רצף 8 שעות (בדיקה קלה)
@@ -1188,19 +1164,24 @@
                             score -= 600000; 
                         }
                     }
-					
+
 					// 6.5. חסימה: יותר ממשמרת ליווי אחת בשבוע
-                    if (shiftIndex === ASSIST_SHIFT_INDEX && (assistanceShiftsCount[name] || 0) >= 1) {
+                    if (shiftIndex === ASSIST_SHIFT_INDEX && assistanceShiftsDone.has(name)) {
                         score -= 5000000; // עונש כבד מאוד למניעת שיבוץ
                     }
 
                     // --- עונשים רגילים ---
-
+					
                     // 7. עונש על חריגה מהמקסימום (4)
                     if (count >= MAX_ALLOWED) {
                          score -= 5000; 
                     }
                     
+					// **חדש: עדכון מעקב ליווי לאחר שיבוץ אוטומטי**
+                     if (shiftIndex === ASSIST_SHIFT_INDEX) {
+                         assistanceShiftsDone.add(name);
+                     }
+					
                     // 8. אכיפת הגבלת משמרת לילה 02:00-06:00 (מכסה שבועית)
                     if (shiftIndex === NIGHT_SHIFT_2_6_INDEX) {
                         const currentNightCount = nightShift2to6Count[name] || 0;
@@ -1219,10 +1200,10 @@
                     const availableInSlot = Array.from(availabilityMap[dayIndex][shiftIndex]);
                     
                     const alreadyAssignedToSlot = new Set(newScheduleData[shiftIndex][dayIndex]);
-                    const filteredCandidates = availableInSlot.filter(name => 
-					!alreadyAssignedToSlot.has(name) && !excludedGuardsSet.has(name)
-					);
-					
+                    let filteredCandidates = availableInSlot.filter(name => !alreadyAssignedToSlot.has(name)); 
+
+                    // **חדש: החרגת אנשי "לווין" מהמועמדים**
+                    filteredCandidates = filteredCandidates.filter(name => !excludedGuardsSet.has(name)); 
 
                     let needed = requiredCount;
                     while (needed > 0) {
@@ -1248,14 +1229,8 @@
                             shiftsFilledThisIteration++; 
                             
                             // *** ספירה רק אם זו לא משמרת ליווי ***
-                            if (shiftIndex !== ASSIST_SHIFT_INDEX) {
-                                employeeShiftsCount[name]++;
-                            }
-							
-							if (shiftIndex === ASSIST_SHIFT_INDEX) {
-                                assistanceShiftsCount[name] = (assistanceShiftsCount[name] || 0) + 1;
-                            }
-
+                            employeeShiftsCount[name]++;
+                            
                             dailyOccupancy[dayIndex].add(name); 
                             
                             // *** עדכוני חסימות והפרות ***
@@ -1363,6 +1338,12 @@
 			}
 
 			const { days: dayHeaders, data: scheduleData } = parsedData;
+			// **חדש: קריאת ימים שבהם הליווי מבוטל (לצורך תצוגה)**
+            const holidaySet = new Set();
+            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
+            holidayCheckboxes.forEach(cb => {
+                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
+            });
 			const datesForWeek = getDatesForWeek(startDateString);
 			
 			// יצירת כותרת ה-CSV: שעות | יום א' (תאריך) | יום ב' (תאריך) | ...
