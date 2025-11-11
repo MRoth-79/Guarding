@@ -110,7 +110,7 @@
 
         textarea {
             width: 100%;
-            min-height: 200px;
+            min-height: 1000px;
             padding: 15px;
             margin-top: 10px;
             border: 1px solid var(--border-color);
@@ -145,10 +145,11 @@
 
         /* ** עיצוב טבלת המשמרות ** */
         #schedule-table {
-            width: 100%;
+            width: auto;
+			display: table;
             border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: var(--shadow);
+            margin: 20px auto;
+            box-shadow: var(--shadow);			
             border-radius: 10px;
             overflow: hidden;
             background-color: white;
@@ -327,6 +328,16 @@
         
         <div id="data-source-section">
             <h3>נתוני משמרות לעריכה ומקור הנתונים 📝</h3>
+			
+			<h3>משיכת נתונים מ-Google Sheet Web App ☁️</h3>
+			<p class="file-format-info">
+				הכנס את כתובת ה-Web App של Google Apps Script (שמחזירה את נתוני הסידור בפורמט טקסט/CSV)
+			</p>
+			<div style="display: flex; gap: 10px; margin-bottom: 15px;">
+				<input type="text" id="googleSheetUrl" placeholder="הדבק כאן את כתובת ה-Web App..." style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; direction: ltr; text-align: left;">
+				<button id="fetchFromSheetButton" style="background-color: #4CAF50; color: white; padding: 10px 15px; min-width: 120px;">משוך נתונים 🔄</button>
+			</div>
+			<p id="fetch-status" style="text-align: center; display: none; font-weight: bold; margin-top: 10px;"></p>
             
             <div class="date-input-container">
                 <label for="startDate">תאריך יום ראשון:</label>
@@ -346,16 +357,6 @@
             </p>
             </textarea>
             
-			<hr style="margin: 20px 0;">
-			<h3>סימון "לווין" (החרגה מסידור) 🛰️</h3>
-			<p class="file-format-info">
-				סמן כאן שומרים שביצעו "לווין".
-				<br>
-				<b>שומרים מסומנים לא ישובצו אוטומטית כלל (הם יוסרו מהחישוב).</b>
-			</p>
-			<div id="guardsChecklist" style="column-count: 2; column-gap: 20px; padding: 15px; background-color: #f0f4f7; border-radius: 6px; border: 1px solid var(--border-color);">
-				</div>
-			<hr style="margin: 20px 0;">
 			<h3>חסימת משמרות ליווי (ימי חופש) 🏖️</h3>
 			<p class="file-format-info" style="padding-top:0; padding-bottom: 10px; margin-bottom: 10px;">
 				סמן ימים שבהם משמרת "ליווי 07:40" <b>אינה</b> נדרשת.
@@ -363,16 +364,7 @@
 			<div id="holidayChecklist" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f4f7; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px;">
 				</div>	
 			<hr style="margin: 20px 0;">
-			<h3>משיכת נתונים מ-Google Sheet Web App ☁️</h3>
-			<p class="file-format-info">
-				הכנס את כתובת ה-Web App של Google Apps Script (שמחזירה את נתוני הסידור בפורמט טקסט/CSV)
-			</p>
-			<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-				<input type="text" id="googleSheetUrl" placeholder="הדבק כאן את כתובת ה-Web App..." style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; direction: ltr; text-align: left;">
-				<button id="fetchFromSheetButton" style="background-color: #4CAF50; color: white; padding: 10px 15px; min-width: 120px;">משוך נתונים 🔄</button>
-			</div>
-			<p id="fetch-status" style="text-align: center; display: none; font-weight: bold; margin-top: 10px;"></p>
-            
+			            
             <div id="button-group">
                 <button id="analyzeButton">נתח נתונים 🔍</button>
                 <button id="downloadButton">הורד קובץ CSV ⬇️</button>
@@ -384,10 +376,11 @@
     </div>
     
     <div id="main-button-wrapper">
+		<button id="quickFetchButton" style="background-color: var(--btn-generate);">משוך נתונים מהיר 🔄</button>
         <button id="autoScheduleButton">סדר אוטומטי 🤖</button>
     </div>
 
-    <div id="results-container">
+    <div id="results-container" style="text-align: center;">
         <p id="initial-message">הטעינה הראשונית תפעיל את הניתוח אוטומטית.</p>
     </div>
 
@@ -465,36 +458,7 @@
                 document.getElementById('googleSheetUrl').value = savedUrl;
             }
 			generateGuardsChecklist();
-			generateHolidayChecklist();
         }
-
-
-		/**
-         * פונקציה חדשה: יצירת צ'קליסט השומרים
-         */
-        function generateGuardsChecklist() {
-            const container = document.getElementById('guardsChecklist');
-            if (!container) return;
-            
-            // Get guards from colorMap. We need to handle keys like 'עידן_יניב'
-            const guardNames = Object.keys(colorMap).map(key => key.includes('_') ? key.replace('_', ' ') : key);
-            
-            // Sort names alphabetically
-            guardNames.sort((a, b) => a.localeCompare(b, 'he'));
-
-            let html = '';
-            guardNames.forEach(name => {
-                // Use a consistent ID for the checkbox, e.g., 'check-גולן'
-                const checkId = `check-${name.replace(' ', '_')}`;
-                html += `
-                    <div style="display: flex; align-items: center; min-width: 120px;">
-                        <input type="checkbox" id="${checkId}" name="satelliteGuard" value="${name}" style="margin-left: 6px; transform: scale(1.2);">
-                        <label for="${checkId}" style="font-size: 15px; cursor: pointer;">${name}</label>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
 
 /**
  * פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי) - *** עם תיקון רוחב אחיד ***
@@ -646,7 +610,7 @@
             const { days: dayHeaders, data: scheduleData } = parsedData;
 
             // **1. יצירת HTML עבור הטבלה המנותחת**
-            let tableHTML = '<h3>טבלת משמרות מנותחת</h3>';
+            let tableHTML = '<h3 style="text-align: center;">טבלת משמרות מנותחת</h3>';
             
             tableHTML += `<p class="file-format-info" style="text-align: center; color: var(--primary-blue);">**הגדרות:** משמרת יום (06:00-22:00): 1 עובד. משמרת לילה (02:00-06:00, 22:00-02:00): עד 2 עובדים. **מינימום שבועי: ${MIN_REQUIRED} משמרות (לא כולל ליווי).**</p>`;
 
@@ -986,13 +950,8 @@
                 return;
             }
 			
-			// **חדש: קריאת רשימת ה"לווין" (החרגה)**
+			// המשתנה מוגדר כסט ריק כדי למנוע שגיאות בהמשך הקוד.
             const excludedGuardsSet = new Set();
-            const checkboxes = document.querySelectorAll('#guardsChecklist input[type="checkbox"]:checked');
-            checkboxes.forEach(cb => {
-                excludedGuardsSet.add(cb.value);
-
-            });
 
 			// **חדש: קריאת ימים שבהם הליווי מבוטל**
             const holidaySet = new Set();
@@ -1202,9 +1161,6 @@
                     const alreadyAssignedToSlot = new Set(newScheduleData[shiftIndex][dayIndex]);
                     let filteredCandidates = availableInSlot.filter(name => !alreadyAssignedToSlot.has(name)); 
 
-                    // **חדש: החרגת אנשי "לווין" מהמועמדים**
-                    filteredCandidates = filteredCandidates.filter(name => !excludedGuardsSet.has(name)); 
-
                     let needed = requiredCount;
                     while (needed > 0) {
                         
@@ -1393,7 +1349,7 @@
 		
 
 
-        async function fetchFromGoogleSheet() {
+        async function fetchFromGoogleSheet(isQuickFetch = false) {
             const url = document.getElementById('googleSheetUrl').value;
             const statusEl = document.getElementById('fetch-status');
             const analyzeButton = document.getElementById('analyzeButton');
@@ -1457,6 +1413,7 @@
         document.getElementById('generateLinkButton').addEventListener('click', downloadHtmlTable);
         document.getElementById('autoScheduleButton').addEventListener('click', autoSchedule);
         document.getElementById('fetchFromSheetButton').addEventListener('click', fetchFromGoogleSheet);
+		document.getElementById('quickFetchButton').addEventListener('click', () => fetchFromGoogleSheet(true));
 		
     
     </script>
