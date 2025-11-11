@@ -330,13 +330,22 @@
             <h3>נתוני משמרות לעריכה ומקור הנתונים 📝</h3>
 			
 			<h3>משיכת נתונים מ-Google Sheet Web App ☁️</h3>
+			
 			<p class="file-format-info">
 				הכנס את כתובת ה-Web App של Google Apps Script (שמחזירה את נתוני הסידור בפורמט טקסט/CSV)
 			</p>
-			<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-				<input type="text" id="googleSheetUrl" placeholder="הדבק כאן את כתובת ה-Web App..." style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; direction: ltr; text-align: left;">
+			
+			<div style="text-align: center; margin-bottom: 15px;">
+				<a href="https://docs.google.com/spreadsheets/d/1NXgjKC-0j4blUQawwzz4lMEhswA561GKxAoSJO5ie_s/edit?gid=0#gid=0" target="_blank" style="text-decoration: none;">
+					<button style="background-color: #f4b400; color: #212121; padding: 10px 30px; font-weight: bold; font-size: 16px;">
+						פתח גיליון נתונים (Google Sheets) 📄
+					</button>
+				</a>
+			</div>
+			<div style="display: flex; gap: 10px; margin-bottom: 5px; margin-top: 10px;"> <input type="text" id="googleSheetUrl" placeholder="הדבק כאן את כתובת ה-Web App..." style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; direction: ltr; text-align: left;">
 				<button id="fetchFromSheetButton" style="background-color: #4CAF50; color: white; padding: 10px 15px; min-width: 120px;">משוך נתונים 🔄</button>
 			</div>
+			
 			<p id="fetch-status" style="text-align: center; display: none; font-weight: bold; margin-top: 10px;"></p>
             
             <div class="date-input-container">
