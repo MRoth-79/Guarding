@@ -664,10 +664,9 @@
                         const cleanedName = name.trim();
                         
                         // 1. בדיקת כפילות יומית (לא כולל ליווי 07:40)
-                        if (!isAssistanceShift && dailyCheck[day].has(cleanedName)) {
-                            dailyDuplicateFound = true;
-                        }
-                        
+						if (dailyCheck[day].has(cleanedName)) { 
+							dailyDuplicateFound = true;
+						}
                         // 2. בדיקת רצף משמרות (8 שעות מנוחה באותו יום)
                         const prevShiftIndex = CONSECUTIVE_SHIFT_CHECK[rowIndex];
                         if (prevShiftIndex !== undefined) {
@@ -679,7 +678,9 @@
                         
 
                         if (cleanedName) { 
-                            dailyCheck[day].add(cleanedName);
+                            if (!isAssistanceShift) { 
+								dailyCheck[day].add(cleanedName);
+							}
                             
                             // 3. איסוף כללי לתדירות שבועית (*** רק משמרות לא-ליווי ***)
                             if (!isAssistanceShift) { 
@@ -1024,27 +1025,40 @@
                         if (!availabilityMap[dayIndex]) availabilityMap[dayIndex] = {};
                         availabilityMap[dayIndex][shiftIndex] = new Set(availableNames);
 
-                        // שיבוץ ידני (אם הוכנסו) וספירת נתונים
-						if (iteration === 0) {
-                            // **תיקון: מנקה ליווי ביום חופש מסומן (כולל שבת)**
-                            // (משתמש ב-holidaySet שהוגדר בתחילת הפונקציה)
-                            const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+						// שיבוץ ידני (אם הוכנסו) וספירת נתונים
+						// *** קוד מתוקן: מפריד בין ליווי (שנשמר ידנית) למשמרות רגילות ***
+						let namesInSlot = []; 
 
-                            if (isBlockedAssistance) {
-                                namesInSlot = []; // מנקה את המשמרת החסומה
-                            // בודק אם השיבוץ הידני תקין (מספר אנשים נכון)
-                            } else if (availableNames.length === required && availableNames.length > 0) {
-                                namesInSlot = availableNames; // שומר שיבוץ ידני תקין
-                            } else {
-                                namesInSlot = []; // מנקה משבצת ריקה או לא תקינה
-                            }
-                            newScheduleData[shiftIndex][dayIndex] = namesInSlot;
-                        }
+						if (iteration === 0) {
+							const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
+
+							if (isAssistanceShift) {
+								// 🛑 עבור ליווי: שומרים את כל השמות שהוזנו ידנית (בלי בדיקת כמות), אלא אם חסום
+								namesInSlot = availableNames.filter(name => allEmployees.includes(name)); 
+								if (isBlockedAssistance) {
+									namesInSlot = []; // מנקה משמרת ליווי ביום חופש מסומן
+								}
+							} else {
+								// 🛑 עבור משמרות רגילות: שומרים שיבוץ ידני רק אם הכמות תקינה
+								if (availableNames.length === required && availableNames.length > 0) {
+									namesInSlot = availableNames; // שומר שיבוץ ידני תקין
+								} else {
+									namesInSlot = []; // מנקה משבצת ריקה או לא תקינה
+								}
+							}
+							// שמירת הנתונים המאומתים/שנשמרו ידנית עבור איטרציות הבאות
+							newScheduleData[shiftIndex][dayIndex] = namesInSlot; 
+						} else {
+							// עבור איטרציות עתידיות: משתמשים בשיבוץ שכבר נקבע
+							namesInSlot = newScheduleData[shiftIndex][dayIndex];
+						}
 
                         namesInSlot.forEach(name => {
                             if (allEmployees.includes(name)) {
 								// סופר את כל המשמרות, כולל ליווי
-                                employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
+                                if (!isAssistanceShift) {
+									employeeShiftsCount[name] = (employeeShiftsCount[name] || 0) + 1;
+								}
 
 								// **חדש: הוספת בדיקה ורישום ליווי ידני**
                                 if (isAssistanceShift) {
@@ -1078,10 +1092,11 @@
 						// התנאי מונע שיבוץ רק אם זו משמרת ליווי בשבת
 						// **תיקון: מונע שיבוץ ליווי ביום חופש מסומן (כולל שבת)**
                         const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
-    
-                        if ( !isBlockedAssistance && newScheduleData[shiftIndex][dayIndex].length < required) {
-                            shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
-                        }
+
+						// התנאי החדש: המשבצת לא חסומה AND זו לא משמרת ליווי AND היא לא מלאה
+						if ( !isBlockedAssistance && !isAssistanceShift && newScheduleData[shiftIndex][dayIndex].length < required) {
+							shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
+						}
                     });
                     if (mustStop) return;
                 });
