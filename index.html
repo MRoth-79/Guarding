@@ -15,7 +15,7 @@
             --btn-download: #546E7A; 
             --btn-generate: #1976D2; 
             --btn-reset: #E53935; 
-			--btn-auto: #1A237E; 
+			--btn-auto: #00A896; 
             --text-color: #212121;
             --border-color: #E0E0E0;
             --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -91,6 +91,11 @@
             width: 100%;
 			color: white;
         }
+		
+		#autoScheduleButton:not(:disabled) {
+			background-color: var(--btn-auto) !important; /* דורס את כל ה-CSS האחר של disabled */
+			color: white !important;
+}
 		
         #button-group {
             display: flex;
@@ -222,7 +227,7 @@
 		.color-גולן { background-color: #fbe9e7; color: #bf360c; } /* כתום אדמדם */
 		.color-חסון { background-color: #e0f2f1; color: #00838f; } /* טורקיז חזק */
 		.color-לישע { background-color: #f1f8e9; color: #558b2f; } /* ירוק זית */
-		.color-עידן_יניב { background-color: #eceff1; color: #37474f; } /* אפור כחול */
+		.color-עידן { background-color: #eceff1; color: #37474f; } /* אפור כחול */
 		.color-חגי { background-color: #fff3e0; color: #e65100; } /* כתום דבש */
 		.color-סתיו { background-color: #e0f7fa; color: #00838f; } /* תכלת ימי */
 		.color-אסף { background-color: #ffebee; color: #c62828; } /* אדום בהיר */
@@ -441,7 +446,7 @@
         const colorMap = {
             'אמיר': 'color-אמיר', 'נמרוד': 'color-נמרוד', 'יובי': 'color-יובי', 'טגניה': 'color-טגניה',
             'ישי': 'color-ישי', 'גולן': 'color-גולן', 'חסון': 'color-חסון', 'לישע': 'color-לישע',
-            'עידן יניב': 'color-עידן_יניב', 'חגי': 'color-חגי', 'סתיו': 'color-סתיו', 'אסף': 'color-אסף',
+            'עידן יניב': 'color-עידן', 'חגי': 'color-חגי', 'סתיו': 'color-סתיו', 'אסף': 'color-אסף',
             'ליאני': 'color-ליאני', 'נתי': 'color-נתי', 'ערן': 'color-ערן', 'מאור': 'color-מאור',
             'ניר': 'color-ניר', 'חורחה': 'color-חורחה', 'שלומי': 'color-שלומי', 'יפתח': 'color-יפתח',
             'חברוני': 'color-חברוני', 'ויקטור': 'color-ויקטור',
