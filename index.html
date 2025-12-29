@@ -20,6 +20,8 @@
             --border-color: #E0E0E0;
             --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             --summary-header: #37474F;
+			--exception-bg: #FFF3E0;
+			--exception-text: #E65100;
         }
 
         body {
@@ -314,7 +316,33 @@
             font-size: 1.1em;
             text-align: center;
         }
+		/* עיצוב טבלת החריגות */
+		#exceptions-table {
+			width: 90%; 
+			margin: 20px auto;
+			border-collapse: collapse;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+			border-radius: 12px;
+			overflow: hidden;
+			background-color: white;
+		}
 
+		#exceptions-table thead {
+			background-color: #E65100; /* צבע כתום אזהרה */
+			color: white;
+		}
+
+		#exceptions-table td, #exceptions-table th {
+			padding: 12px;
+			text-align: center;
+			border-bottom: 1px solid #FFE0B2;
+		}
+
+		#exceptions-table tbody tr {
+			background-color: var(--exception-bg);
+			color: var(--exception-text);
+		}
+		
         hr {
             border: 0;
             height: 1px;
@@ -370,6 +398,10 @@
                 placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
             </p>
             </textarea>
+			
+			<h3>עובדים ל-5 משמרות השבוע (חייבים להגיע ליעד) 🏆</h3>
+			<p class="file-format-info">הזן את שמות העובדים שצריכים להגיע ל-5 משמרות, מופרדים בפסיקים או בשורות חדשות.</p>
+			<textarea id="guardsFor5Shifts" style="min-height: 80px;" placeholder="לדוגמה: אסף, גולן, נמרוד, מאור"></textarea>
             
 			<h3>חסימת משמרות ליווי (ימי חופש) 🏖️</h3>
 			<p class="file-format-info" style="padding-top:0; padding-bottom: 10px; margin-bottom: 10px;">
@@ -411,8 +443,8 @@
         const INITIAL_SCHEDULE_DATA = ``; 
 
         // הגדרות קבועות
-        const MIN_REQUIRED = 3; // *** אילוץ: מינימום 3 משמרות ***
-        const MAX_ALLOWED = 4;
+        const MIN_REQUIRED = 4; // *** אילוץ: מינימום 3 משמרות ***
+        const MAX_ALLOWED = 5;
         const MAX_NIGHT_2_6 = 2; // מקסימום שמירות בשעות 02:00-06:00
         const MAX_ITERATIONS = 10; // מספר ניסיונות סידור אוטומטי
         const EXPECTED_DAYS = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
@@ -622,6 +654,9 @@
 
             const datesForWeek = getDatesForWeek(startDateString);
             const { days: dayHeaders, data: scheduleData } = parsedData;
+			
+			const guardsFor5Text = document.getElementById('guardsFor5Shifts').value;
+            const guardsFor5Set = new Set(guardsFor5Text.split(/[,\n]/).map(name => name.trim()).filter(name => name !== ''));
 
             // **1. יצירת HTML עבור הטבלה המנותחת**
             let tableHTML = '<h3 style="text-align: center;">טבלת משמרות מנותחת</h3>';
@@ -641,6 +676,7 @@
             const allShifts = {};
             const nightShift2to6Count = {}; 
             const dailyCheck = {};
+			const exceptions = [];
             
             scheduleData.forEach((row, rowIndex) => {
                 const timeSlotFull = EXPECTED_TIME_SLOTS[rowIndex];
@@ -670,8 +706,14 @@
                         
                         // 1. בדיקת כפילות יומית (לא כולל ליווי 07:40)
 						if (dailyCheck[day].has(cleanedName)) { 
-							dailyDuplicateFound = true;
+							exceptions.push({
+								day: day,
+								slot: timeSlotDisplay,
+								name: cleanedName,
+								msg: "כפילות: משובץ ביותר ממשמרת אחת ביום"
+							});
 						}
+						
                         // 2. בדיקת רצף משמרות (8 שעות מנוחה באותו יום)
                         const prevShiftIndex = CONSECUTIVE_SHIFT_CHECK[rowIndex];
                         if (prevShiftIndex !== undefined) {
@@ -711,29 +753,56 @@
                         const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
 
                         names.forEach(currentName => {
-                            if (prevNightNames.includes(currentName.trim())) { nightRestViolation = true; } 
+							if (prevNightNames.includes(currentName.trim())) { 
+								// אנחנו מוסיפים את החריגה לרשימה
+								exceptions.push({
+									day: day,
+									slot: timeSlotDisplay,
+									name: currentName.trim(),
+									msg: "הפרת מנוחת לילה: שמר בלילה (22-02) ומשובץ לפני 14:00 למחרת"
+								});
+								nightRestViolation = true; // נשאיר את המשתנה כ-true כדי שהלוגיקה תדע שהייתה חריגה
+							}
                         });
                     }
 
                     // 5.2 Check 02:00-06:00 (Same Day) to Day (Same Day Block until 18:00)
-                    if (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX || rowIndex === AFTERNOON_SHIFT_14_18_INDEX) {
-                        const night02_06_shift_cell = scheduleData[NIGHT_SHIFT_02_06_INDEX][colIndex];
-                        const nightNames = night02_06_shift_cell.split(',').map(n => n.trim()).filter(n => n.length > 0);
-                        
-                        names.forEach(currentName => {
-                            if (nightNames.includes(currentName.trim())) { sameDayNightBlockViolation = true; }
-                        });
-                    }
+					if (rowIndex === MORNING_SHIFT_6_10_INDEX || rowIndex === MORNING_SHIFT_10_14_INDEX || rowIndex === AFTERNOON_SHIFT_14_18_INDEX) {
+						const night02_06_shift_cell = scheduleData[NIGHT_SHIFT_02_06_INDEX][colIndex];
+						const nightNames = night02_06_shift_cell.split(',').map(n => n.trim()).filter(n => n.length > 0);
+						
+						names.forEach(currentName => {
+							if (nightNames.includes(currentName.trim())) { 
+								// רישום בטבלת החריגות
+								exceptions.push({
+									day: day,
+									slot: timeSlotDisplay,
+									name: currentName.trim(),
+									msg: "הפרת מנוחה (18:00): שמר בלילה (02-06) ומשובץ שוב לפני 18:00 באותו יום"
+								});
+								sameDayNightBlockViolation = true; 
+							}
+						});
+					}
                     
                     // 6. **בדיקת הפרת רצף לילות (22-02 אתמול -> 02-06 היום)**
-                    if (rowIndex === NIGHT_SHIFT_02_06_INDEX && colIndex > 0) {
-                        const prevDayIndex = colIndex - 1;
-                        const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
-                        const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
-                        names.forEach(currentName => {
-                            if (prevNightNames.includes(currentName.trim())) { consecutiveNightViolation = true; }
-                        });
-                    }
+					if (rowIndex === NIGHT_SHIFT_02_06_INDEX && colIndex > 0) {
+						const prevDayIndex = colIndex - 1;
+						const prevNightShiftCell = scheduleData[NIGHT_SHIFT_22_2_INDEX][prevDayIndex];
+						const prevNightNames = prevNightShiftCell.split(',').map(n => n.trim()).filter(n => n.length > 0);
+						names.forEach(currentName => {
+							if (prevNightNames.includes(currentName.trim())) { 
+								// רישום בטבלת החריגות
+								exceptions.push({
+									day: day,
+									slot: timeSlotDisplay,
+									name: currentName.trim(),
+									msg: "רצף לילות אסור: שמר אתמול בלילה (22-02) ומשובץ היום בלילה (02-06)"
+								});
+								consecutiveNightViolation = true; 
+							}
+						});
+					}
 
                     // 7. **בדיקה נוספת: חריגה ממשמרת 02:00-06:00 (מכסה שבועית)**
                     let night2to6LimitExceeded = false;
@@ -756,30 +825,20 @@
                             cellClass = 'needs-selection';
                             warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
                         }
-                    } else if (dailyDuplicateFound) {
-                        cellClass = 'daily-duplicate-warning';
-                        warningText = '<span class="warning-text">⚠️ כפילות יומית!</span>';
-                    } else if (sameDayNightBlockViolation) {
-                        cellClass = 'night-rest-violation-warning';
-                        warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 18:00)!</span>'; 
-                    } else if (nightRestViolation) { 
-                        cellClass = 'night-rest-violation-warning';
-                        warningText = '<span class="warning-text">❌ הפרת מנוחת לילה (עד 14:00)!</span>';
-                    } else if (consecutiveNightViolation) { 
-                        cellClass = 'night-rest-violation-warning';
-                        warningText = '<span class="warning-text">❌ רצף לילות אסור!</span>';
-                    } else if (consecutiveShiftViolation) { 
-                        cellClass = 'night-rest-violation-warning';
-                        warningText = '<span class="warning-text">❌ הפרת רצף (8 שעות מנוחה)!</span>';
-                    } else if (night2to6LimitExceeded) { 
-                        cellClass = 'night-shift-limit-warning';
-                        warningText = `<span class="warning-text">⚠️ חריגה! (מעל ${MAX_NIGHT_2_6} לילות 02-06)</span>`;
+                    } else if (consecutiveShiftViolation) {
+                        exceptions.push({
+                            day: day,
+                            slot: timeSlotDisplay,
+                            name: names.join(', '),
+                            msg: "הפרת רצף: פחות מ-8 שעות מנוחה בין משמרות באותו יום"
+                        });
+                        // משאירים class רגיל כדי שלא יהיה אדום
+                        cellClass = isNightShift ? 'night-shift-ok' : 'ok-shift';
                     } else if (numNames > maxAllowedInShift && numNames > 0) {
-                        // אם יש יותר עובדים ממה שנדרש, אנחנו מציגים אזהרה
-                       cellClass = 'needs-selection'; 
-                       warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
+                        cellClass = 'needs-selection'; 
+                        warningText = `<span class="warning-text">⚠️ יותר מדי עובדים (${numNames}). דרושים: ${maxAllowedInShift}</span>`;
                     } else {
-                        // **שינוי כאן: קביעת קלאס לפי סוג המשמרת**
+                        // מצב תקין או חריגה שנרשמה כבר בטבלה למטה
                         if (isAssistanceShift) {
                             cellClass = 'red-assistance-shift';
                         } else {
@@ -837,21 +896,28 @@
                     `<span class="night-limit-ok">✅ ${night2to6Count}</span>`;
 
 
-                // **בדיקת הטווח החדש (3-4)**
+				// בדיקת עמידה בתנאי החדש (3 עד 5 משמרות)
                 if (count >= MIN_REQUIRED && count <= MAX_ALLOWED) {
-                    rowClass = (count === MAX_ALLOWED) ? 'shifts-4-count' : 'shifts-3-count'; 
-                    statusText = `✅ עמד (${count} משמרות)`;
+                    // הגדרת עיצוב שונה ל-5 משמרות לעומת 3-4 אם תרצה
+                    rowClass = (count >= 4) ? 'shifts-4-count' : 'shifts-3-count';
+                    statusText = (count === 5) ? `✅ עמד (5 משמרות - מקסימום)` : `✅ עמד (${count} משמרות)`;
                 } else if (count < MIN_REQUIRED) {
                     rowClass = 'low-shifts';
-                    statusText = `❌ **לא עמד (פחות מ-${MIN_REQUIRED} - ${count})**`;
-                } else if (count > MAX_ALLOWED) {
+                    statusText = `❌ לא עמד (פחות מ-${MIN_REQUIRED} - ${count})`;
+                } else { 
+                    // כאן נכנסים רק אם count הוא 6 ומעלה
                     rowClass = 'not-met-condition';
-                    statusText = `❌ לא עמד (יותר מדי - ${count})`;
-                } else {
-                    rowClass = 'not-met-condition'; 
-                    statusText = `❌ לא עמד (${count})`;
+                    statusText = `❌ איסור! (יותר מדי - ${count})`;
+                    
+                    // רישום חריגת מכסה בטבלה הכתומה
+                    exceptions.push({
+                        day: "סיכום שבועי",
+                        slot: "מכסת משמרות",
+                        name: name,
+                        msg: `חריגה: ${count} משמרות (המקסימום המותר הוא 5)`
+                    });
                 }
-                
+				
                 // הוספת קלאס התראה גם אם חרגו ממשמרת הלילה הספציפית
                 if (night2to6Count > MAX_NIGHT_2_6) {
                     rowClass += ' night-limit-fail-row';
@@ -870,9 +936,44 @@
 
             summaryTableHTML += '</tbody></table>';
             
-            tableHTML += summaryTableHTML;
+			
+		// --- בניית טבלת החריגות (מעל הסיכום) ---
+		let exceptionsTableHTML = `
+			<div style="text-align: center; margin-top: 20px;">
+				<h3 id="exceptions-header">⚠️ ריכוז חריגות ואזהרות</h3>
+			</div>
+			<table id="exceptions-table">
+				<thead>
+					<tr>
+						<th>יום</th>
+						<th>משמרת</th>
+						<th>עובד</th>
+						<th>פירוט החריגה</th>
+					</tr>
+				</thead>
+				<tbody>`;
 
-            resultsContainer.innerHTML = tableHTML;
+		if (exceptions.length === 0) {
+			exceptionsTableHTML += `<tr><td colspan="4">אין חריגות בסידור! ✅</td></tr>`;
+		} else {
+			exceptions.forEach(ex => {
+				exceptionsTableHTML += `<tr>
+					<td>${ex.day}</td>
+					<td>${ex.slot}</td>
+					<td><b>${ex.name}</b></td>
+					<td>${ex.msg}</td>
+				</tr>`;
+			});
+		}
+		exceptionsTableHTML += `</tbody></table><hr>`;
+
+		// --- החיבור הסופי לפי הסדר המבוקש ---
+		// קודם כל הטבלה הראשית שכבר נמצאת בתוך tableHTML
+		// עכשיו מוסיפים את החריגות, ורק אז את הסיכום
+		tableHTML += exceptionsTableHTML + summaryTableHTML;
+
+		// הצגת התוצאה הסופית במסך
+		resultsContainer.innerHTML = tableHTML;
         }
 
 
@@ -957,6 +1058,8 @@
 
         // פונקציה חדשה לסידור אוטומטי של המשמרות - עם אילוצים מעודכנים
         function autoSchedule() {
+			const guardsFor5Text = document.getElementById('guardsFor5Shifts').value;
+			const guardsFor5Set = new Set(guardsFor5Text.split(/[,\n]/).map(name => name.trim()).filter(name => name !== ''));
             const textContent = document.getElementById('dataToAnalyze').value;
             const startDateString = document.getElementById('startDate').value;
 
@@ -1123,10 +1226,12 @@
                     // 1. ציון לפי תדירות כוללת: עדיפות למי ששמר פחות
                     score += (MAX_ALLOWED + 1) - count; 
 
-                    // 2. **אכיפת מינימום 3 משמרות: בונוס גבוה למי שמתחת למינימום**
-                    if (count < MIN_REQUIRED) { 
-                         score += 200 * (MIN_REQUIRED - count); 
-                    }
+                    // 2. **אכיפת מינימום דינמית (4 לרוב, 5 לנבחרים)**
+                    let personalMin = guardsFor5Set.has(name) ? 5 : MIN_REQUIRED;
+
+					if (count < personalMin) { 
+						 score += 700 * (personalMin - count); // בונוס ענק להבטחת היעד למי שצריך 5
+					}
 					
                     // --- עונשים קריטיים (מונעים שיבוץ) ---
                     
