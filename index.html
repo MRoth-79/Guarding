@@ -291,11 +291,33 @@
             background-color: #F5F5F5;
         }
         
-        /* סגנונות שורות הסיכום */
-        .low-shifts { background-color: #FBECEC; color: var(--accent-red); font-weight: bold; } 
-        .shifts-3-count { background-color: #E8F5E9; color: #388E3C; } /* ירוק בהיר לאישור */
-        .shifts-4-count { background-color: #C8E6C9; color: #1B5E20; font-weight: bold; } 
-        .night-limit-fail-row { background-color: #FFEBEE; } /* רקע אדום בהיר לכישלון */
+		/* סגנונות שורות הסיכום */
+		.low-shifts { background-color: #FBECEC; color: var(--accent-red); font-weight: bold; } 
+		.shifts-3-count { background-color: #E8F5E9; color: #388E3C; } 
+		.shifts-4-count { background-color: #C8E6C9; color: #1B5E20; font-weight: bold; } 
+		.night-limit-fail-row { background-color: #FFEBEE; } 
+
+		/* שורת 5 משמרות - כחול */
+		.shifts-5-count { 
+			background-color: #E3F2FD !important; 
+			color: #0D47A1 !important; 
+			font-weight: bold; 
+			border-right: 6px solid #1976D2; 
+		}
+
+		/* הבלטה (Hover) לכל סוגי השורות - כדי שהכל יגיב לעכבר */
+		.shifts-5-count:hover { background-color: #BBDEFB !important; cursor: pointer; }
+		.shifts-4-count:hover { background-color: #A5D6A7 !important; cursor: pointer; }
+		.low-shifts:hover { background-color: #FFCDD2 !important; cursor: pointer; }
+		
+		/* עיצוב להבלטת כל המופעים של אותו שם בבת אחת */
+		.highlight-name {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.4) !important;
+            border: 2px solid #000 !important;
+            z-index: 10;
+            position: relative;
+        }
         
         .night-limit-fail { color: var(--accent-red); font-weight: bold; }
         .night-limit-ok { color: #388E3C; } /* ירוק לאישור */
@@ -883,7 +905,18 @@
                     </thead>
                     <tbody id="summary-body">`;
             
-            const sortedNames = Object.keys(allShifts).sort();
+            const sortedNames = Object.keys(allShifts).sort((a, b) => {
+				const countA = allShifts[a];
+				const countB = allShifts[b];
+
+				// אם כמות המשמרות שונה, שים את הגבוהה יותר למעלה
+				if (countB !== countA) {
+					return countB - countA; // הגבוה ביותר (5) יהיה ראשון
+				}
+
+				// אם הכמות שווה, מיין לפי סדר האותיות (כדי שיהיה מסודר)
+				return a.localeCompare(b, 'he');
+			});
             let counter = 1;
             sortedNames.forEach(name => {
                 const count = allShifts[name];
@@ -897,26 +930,26 @@
 
 
 				// בדיקת עמידה בתנאי החדש (3 עד 5 משמרות)
-                if (count >= MIN_REQUIRED && count <= MAX_ALLOWED) {
-                    // הגדרת עיצוב שונה ל-5 משמרות לעומת 3-4 אם תרצה
-                    rowClass = (count >= 4) ? 'shifts-4-count' : 'shifts-3-count';
-                    statusText = (count === 5) ? `✅ עמד (5 משמרות - מקסימום)` : `✅ עמד (${count} משמרות)`;
-                } else if (count < MIN_REQUIRED) {
-                    rowClass = 'low-shifts';
-                    statusText = `❌ לא עמד (פחות מ-${MIN_REQUIRED} - ${count})`;
-                } else { 
-                    // כאן נכנסים רק אם count הוא 6 ומעלה
-                    rowClass = 'not-met-condition';
-                    statusText = `❌ איסור! (יותר מדי - ${count})`;
-                    
-                    // רישום חריגת מכסה בטבלה הכתומה
-                    exceptions.push({
-                        day: "סיכום שבועי",
-                        slot: "מכסת משמרות",
-                        name: name,
-                        msg: `חריגה: ${count} משמרות (המקסימום המותר הוא 5)`
-                    });
-                }
+			if (count === 5) {
+					rowClass = 'shifts-5-count'; // כחול
+					statusText = `✅ עמד (5 משמרות - מקסימום)`;
+				} else if (count === 4) {
+					rowClass = 'shifts-4-count'; // ירוק כהה
+					statusText = `✅ עמד (4 משמרות)`;
+				} else if (count < MIN_REQUIRED) {
+					rowClass = 'low-shifts'; // אדום
+					statusText = `❌ לא עמד (פחות מ-${MIN_REQUIRED} - ${count})`;
+				} else { 
+					rowClass = 'not-met-condition';
+					statusText = `❌ איסור! (יותר מדי - ${count})`;
+					
+					exceptions.push({
+						day: "סיכום שבועי",
+						slot: "מכסת משמרות",
+						name: name,
+						msg: `חריגה: ${count} משמרות (המקסימום המותר הוא 5)`
+					});
+				}
 				
                 // הוספת קלאס התראה גם אם חרגו ממשמרת הלילה הספציפית
                 if (night2to6Count > MAX_NIGHT_2_6) {
@@ -1548,6 +1581,22 @@
         document.getElementById('autoScheduleButton').addEventListener('click', autoSchedule);
         document.getElementById('fetchFromSheetButton').addEventListener('click', fetchFromGoogleSheet);
 		document.getElementById('quickFetchButton').addEventListener('click', () => fetchFromGoogleSheet(true));
+		
+		// הבלטת כל השמות הזהים בטבלה בעת מעבר עכבר
+        document.addEventListener('mouseover', function (e) {
+            if (e.target.classList.contains('person')) {
+                const name = e.target.textContent.trim();
+                document.querySelectorAll('.person').forEach(el => {
+                    if (el.textContent.trim() === name) el.classList.add('highlight-name');
+                });
+            }
+        });
+
+        document.addEventListener('mouseout', function (e) {
+            if (e.target.classList.contains('person')) {
+                document.querySelectorAll('.person').forEach(el => el.classList.remove('highlight-name'));
+            }
+        });
 		
     
     </script>
