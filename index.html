@@ -201,11 +201,12 @@
 		}
 		
 
-        /* ** עיצוב שמות העובדים (Tag/Pill) ** */
+		/* עיצוב שמות העובדים - מעודכן להופעה אנכית */
         .person {
-            display: inline-block;
-            padding: 4px 10px;
-            margin: 3px 1px;
+            display: block; /* גורם לכל שם לתפוס שורה שלמה (שם מעל שם) */
+            width: fit-content; /* שומר על הבועה בגודל הטקסט ולא נמתח לכל הרוחב */
+            margin: 5px auto; /* מרכז את השם בתוך המשבצת ומוסיף רווח קטן ביניהם */
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 1.3em;
             font-weight: 600;
@@ -310,13 +311,16 @@
 		.shifts-4-count:hover { background-color: #A5D6A7 !important; cursor: pointer; }
 		.low-shifts:hover { background-color: #FFCDD2 !important; cursor: pointer; }
 		
-		/* עיצוב להבלטת כל המופעים של אותו שם בבת אחת */
-		.highlight-name {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(0,0,0,0.4) !important;
-            border: 2px solid #000 !important;
-            z-index: 10;
-            position: relative;
+		/* הבלטה ששומרת על צבע המקור והופכת אותו לזוהר */
+        .highlight-name {
+            transform: scale(1.3) !important; /* הגדלה משמעותית */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5) !important; /* צל שמקפיץ את השם החוצה */
+            border: 2px solid #000 !important; /* מסגרת שחורה חדה */
+            z-index: 1000 !important;
+            position: relative !important;
+            /* גורם לצבע הרקע המקורי להיות בהיר וזוהר יותר */
+            filter: brightness(1.2) contrast(1.1) !important; 
+            transition: all 0.1s ease;
         }
         
         .night-limit-fail { color: var(--accent-red); font-weight: bold; }
@@ -1013,80 +1017,88 @@
         /**
          * פונקציה מעודכנת להורדת קובץ HTML שמכיל רק את הטבלה המעוצבת - כולל תאריכים
          */
-        function downloadHtmlTable() {
-            if (!lastRenderedTableHTML) {
-                alert('אין טבלת משמרות מנותחת! אנא הפעל את "סדר אוטומטי 🤖" או "נתח נתונים 🔍" תחילה.');
-                return;
-            }
-            
-            const startDateString = document.getElementById('startDate').value;
-            if (!startDateString) {
-                alert('אנא בחר תאריך התחלה (יום ראשון) לפני הורדת הקובץ.');
-                return;
-            }
+		function downloadHtmlTable() {
+			const startDateString = document.getElementById('startDate').value;
+			const resultsHTML = document.getElementById('results-container').innerHTML;
 
+			if (!startDateString || !resultsHTML || resultsHTML.includes('הטעינה הראשונית')) {
+				alert('יש לבחור תאריך ולבצע ניתוח נתונים לפני ההורדה!');
+				return;
+			}
+		
+			// --- חישוב תאריכי השבוע לכותרת ---
+            const [year, month, day] = startDateString.split('-');
+            const dateSun = new Date(year, month - 1, day);
+            const dateSat = new Date(dateSun);
+            dateSat.setDate(dateSun.getDate() + 6); // מוסיף 6 ימים כדי להגיע לשבת
+			
+			const format = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+			const dynamicHeader = `טבלת משמרות שבועית ${format(dateSun)} - ${format(dateSat)}`;
+			
             const datesForWeek = getDatesForWeek(startDateString);
-            
-            // יצירת כותרת הטבלה מחדש כדי לוודא שהתאריכים מעודכנים בתוך קובץ ה-HTML להורדה
-            let updatedTableHTML = lastRenderedTableHTML;
-            let headerReplacement = '<tr><th>שעות / יום</th>';
-            EXPECTED_DAYS.forEach((day, index) => {
-                headerReplacement += `<th>${day}<span class="date-text">${datesForWeek[index]}</span></th>`;
-            });
-            headerReplacement += '</tr>';
-
-            // החלפת הכותרת הישנה (שמורה ב-lastRenderedTableHTML) בחדשה
-            // חיפוש ה-HTML של כותרת הטבלה ב-lastRenderedTableHTML
-            const originalHeaderMatch = lastRenderedTableHTML.match(/<thead>(.*?)<\/thead>/s);
-            if (originalHeaderMatch) {
-                const originalHeaderContent = originalHeaderMatch[1];
-                const newHeaderContent = originalHeaderContent.replace(/<tr>(.*?)<\/tr>/s, headerReplacement);
-                updatedTableHTML = lastRenderedTableHTML.replace(originalHeaderMatch[0], `<thead>${newHeaderContent}</thead>`);
-            }
-            
             const style = document.querySelector('style').textContent;
 
-            // יוצרים את קובץ ה-HTML הנקי (מבודד)
+            // כאן אנחנו מוסיפים את הקוד שיופיע בתוך הקובץ שנשלח בוואטסאפ
+            const highlightScript = `
+                document.addEventListener('mouseover', function (e) {
+                    if (e.target.classList.contains('person')) {
+                        const name = e.target.textContent.trim();
+                        document.querySelectorAll('.person').forEach(el => {
+                            if (el.textContent.trim() === name) el.classList.add('highlight-name');
+                        });
+                    }
+                });
+                document.addEventListener('mouseout', function (e) {
+                    if (e.target.classList.contains('person')) {
+                        document.querySelectorAll('.person').forEach(el => el.classList.remove('highlight-name'));
+                    }
+                });
+                // תמיכה בטלפונים ניידים - לחיצה מדליקה/מכבה את הסימון
+                document.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('person')) {
+                        const name = e.target.textContent.trim();
+                        const isHighlighted = e.target.classList.contains('highlight-name');
+                        document.querySelectorAll('.person').forEach(el => el.classList.remove('highlight-name'));
+                        if (!isHighlighted) {
+                            document.querySelectorAll('.person').forEach(el => {
+                                if (el.textContent.trim() === name) el.classList.add('highlight-name');
+                            });
+                        }
+                    } else {
+                        document.querySelectorAll('.person').forEach(el => el.classList.remove('highlight-name'));
+                    }
+                });
+            `;
+
             const cleanHTMLContent = `
                 <!DOCTYPE html>
                 <html lang="he" dir="rtl">
                 <head>
                     <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>טבלת משמרות שבועית - מעוצבת</title>
+                    <title>${dynamicHeader}</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; direction: rtl; background-color: #f7f9fb; color: #333; }
-                        h2 { color: var(--primary-blue); padding-bottom: 15px; margin-bottom: 30px; }
                         ${style}
-                        #input-section-wrapper, #button-group, #autoScheduleButton, #resetButton { display: none !important; }
+                        body { padding: 20px; text-align: center; }
                     </style>
                 </head>
                 <body>
-                    <h2>טבלת משמרות שבועית - משובצת וסופית </h2>
-                    <div id="results-container" style="max-width: 90%; margin: 20px auto;">
-                        ${updatedTableHTML}
-                    </div>
-                    <p style="text-align: center; color: #777; margin-top: 30px;">דף זה נוצר אוטומטית על ידי מנתח המשמרות.</p>
+                    <h2 style="text-align: center; text-decoration: underline; color: #00796B;">${dynamicHeader}</h2>
+                    <div id="results-container">${lastRenderedTableHTML}</div>
+                    <script>${highlightScript}<\/script>
                 </body>
                 </html>
             `;
             
-            const bom = '\ufeff'; 
+            const bom = '\ufeff'; 
             const blob = new Blob([bom + cleanHTMLContent], { type: 'text/html;charset=utf-8' });
-            
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-
-            link.href = url;
-            link.download = `schedule_table_${startDateString}_maor.html`;
-            link.click(); 
-
-            URL.revokeObjectURL(url);
-            
-            const msg = document.getElementById('link-message');
-            msg.querySelector('p').textContent = '✅ קובץ HTML הורד בהצלחה!';
-            msg.style.backgroundColor = '#4CAF50';
-            setTimeout(() => { msg.style.display = 'none'; msg.style.backgroundColor = '#4CAF50'; }, 3000);
+			link.href = url;
+			link.download = `sidur_${startDateString}.html`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
         }
 
         // פונקציה חדשה לסידור אוטומטי של המשמרות - עם אילוצים מעודכנים
