@@ -215,6 +215,7 @@
 		#schedule-table td:last-child {
 			padding-left: 20px;
 		}
+		
 
 		/* =========================================
 		   5. שמות שומרים (בועות) וצבעים
@@ -322,6 +323,29 @@
 				overflow-x: auto;
 			}
 		}
+		
+		/* =========================================
+		   8. עיצוב שורת הליווי 07:40 בצהוב נעים
+		   ========================================= */	
+
+		.red-assistance-shift td {
+			background-color: #E1F5FE !important; /* תכלת עדין לכל השבוע כולל יום ראשון */
+			color: #0277BD !important;            /* טקסט כחול כהה */
+			font-weight: bold;
+		}
+
+		/* החרגת יום שבת בלבד (עמודה 7) - שיישאר אפרסק */
+		#schedule-table tbody tr.red-assistance-shift td:nth-child(7) {
+			background-color: var(--saturday-bg) !important;
+			color: #0277BD !important; /* שומר על צבע הטקסט של הליווי */
+		}
+
+		/* הגנה על עמודת השעות שלא תהפוך לתכלת */
+		.red-assistance-shift td.time-slot {
+			background-color: var(--secondary-blue) !important;
+			color: white !important;
+		}
+		
 	</style>
 </head>
 <body onload="initializeData(); document.getElementById('analyzeButton').click();">
@@ -469,8 +493,7 @@
 			const today = new Date();
 			let dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני...
 			
-			// חישוב המרחק מיום שני: 
-			// אם היום יום ראשון (0), נחזור 6 ימים אחורה. אחרת, נחזור ליום שני של השבוע הנוכחי.
+			// חישוב המרחק מיום שני האחרון
 			let diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
 			today.setDate(today.getDate() - diffToMonday);
 			
@@ -482,9 +505,9 @@
 				document.getElementById('googleSheetUrl').value = savedUrl;
 			}
 			
-			// יצירת הכפתורים והצ'קליסט מחדש לפי הסדר החדש
-			generateGuardsButtons();
-			generateHolidayChecklist(); 
+			// קריאה לפונקציות העזר
+			if (typeof generateGuardsButtons === "function") generateGuardsButtons();
+			if (typeof generateHolidayChecklist === "function") generateHolidayChecklist(); 
 		}
 
 /**
@@ -1574,5 +1597,70 @@
 		
     
     </script>
+	// --- ניהול הבלטת שמות סופי ומוגן מהבהוב (מחשב + נייד) ---
+	let lockedName = null; 
+	let lastTouchTime = 0; // משתנה שזוכר מתי הייתה נגיעה במסך
+
+	// פונקציה מרכזית לניהול הבלטות
+	function updateHighlights(nameToHighlight) {
+		const allPersons = document.querySelectorAll('.person');
+		allPersons.forEach(el => {
+			if (nameToHighlight && el.textContent.trim() === nameToHighlight) {
+				el.classList.add('highlight-name');
+			} else {
+				el.classList.remove('highlight-name');
+			}
+		});
+	}
+
+	// זיהוי נגיעה במסך - חוסם אירועי עכבר מזויפים בנייד
+	document.addEventListener('touchstart', function() {
+		lastTouchTime = Date.now();
+	}, { passive: true });
+
+	// 1. מעבר עכבר (mouseover) - יתבצע רק במחשב (לא אחרי נגיעה)
+	document.addEventListener('mouseover', function (e) {
+		// אם עבר פחות מחצי שנייה מהנגיעה האחרונה - זה נייד, נתעלם
+		if (Date.now() - lastTouchTime < 500) return;
+
+		const personEl = e.target.closest('.person');
+		if (personEl && !lockedName) {
+			updateHighlights(personEl.textContent.trim());
+		}
+	});
+
+	// 2. יציאת עכבר (mouseout) - יתבצע רק במחשב
+	document.addEventListener('mouseout', function (e) {
+		if (Date.now() - lastTouchTime < 500) return;
+
+		if (!lockedName) {
+			updateHighlights(null);
+		}
+	});
+
+	// 3. לחיצה (click) - עובד מעולה גם בנייד וגם במחשב
+	document.addEventListener('click', function (e) {
+		const personEl = e.target.closest('.person');
+		
+		if (personEl) {
+			const clickedName = personEl.textContent.trim();
+			
+			if (lockedName === clickedName) {
+				// לחיצה חוזרת משחררת
+				lockedName = null;
+				updateHighlights(null);
+			} else {
+				// לחיצה ראשונה נועלת
+				lockedName = clickedName;
+				updateHighlights(clickedName);
+			}
+		} else {
+			// לחיצה על שטח ריק מנקה הכל
+			lockedName = null;
+			updateHighlights(null);
+		}
+	});
+	</script>
+	
 </body>
 </html>
