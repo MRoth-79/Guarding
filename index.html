@@ -493,11 +493,16 @@
 			const today = new Date();
 			let dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני...
 			
-			// חישוב המרחק מיום שני האחרון
-			let diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+			// חישוב המרחק ליום שני הקרוב/הנוכחי
+			// אם היום יום ראשון, נלך יום אחד קדימה. אם יום אחר, נחזור ליום שני של השבוע הנוכחי.
+			let diffToMonday = (dayOfWeek === 0) ? -1 : dayOfWeek - 1;
 			today.setDate(today.getDate() - diffToMonday);
 			
 			const formattedDate = today.toISOString().split('T')[0];
+			// שינוי הכותרת בתצוגה ליום שני
+			const dateLabel = document.querySelector('label[for="startDate"]');
+			if (dateLabel) dateLabel.textContent = "תאריך יום שני (תחילת שבוע):";
+			
 			document.getElementById('startDate').value = formattedDate;
 
 			const savedUrl = localStorage.getItem('googleSheetUrl');
@@ -505,7 +510,6 @@
 				document.getElementById('googleSheetUrl').value = savedUrl;
 			}
 			
-			// קריאה לפונקציות העזר
 			if (typeof generateGuardsButtons === "function") generateGuardsButtons();
 			if (typeof generateHolidayChecklist === "function") generateHolidayChecklist(); 
 		}
@@ -1596,71 +1600,59 @@
         });
 		
     
+
+		// סגירת ה-mouseout הקודם
+
+        // --- ניהול הבלטת שמות סופי ומוגן מהבהוב (מחשב + נייד) ---
+        let lockedName = null; 
+        let lastTouchTime = 0; 
+
+        function updateHighlights(nameToHighlight) {
+            const allPersons = document.querySelectorAll('.person');
+            allPersons.forEach(el => {
+                if (nameToHighlight && el.textContent.trim() === nameToHighlight) {
+                    el.classList.add('highlight-name');
+                } else {
+                    el.classList.remove('highlight-name');
+                }
+            });
+        }
+
+        document.addEventListener('touchstart', function() {
+            lastTouchTime = Date.now();
+        }, { passive: true });
+
+        document.addEventListener('mouseover', function (e) {
+            if (Date.now() - lastTouchTime < 500) return;
+            const personEl = e.target.closest('.person');
+            if (personEl && !lockedName) {
+                updateHighlights(personEl.textContent.trim());
+            }
+        });
+
+        document.addEventListener('mouseout', function (e) {
+            if (Date.now() - lastTouchTime < 500) return;
+            if (!lockedName) {
+                updateHighlights(null);
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            const personEl = e.target.closest('.person');
+            if (personEl) {
+                const clickedName = personEl.textContent.trim();
+                if (lockedName === clickedName) {
+                    lockedName = null;
+                    updateHighlights(null);
+                } else {
+                    lockedName = clickedName;
+                    updateHighlights(clickedName);
+                }
+            } else {
+                lockedName = null;
+                updateHighlights(null);
+            }
+        });
     </script>
-	// --- ניהול הבלטת שמות סופי ומוגן מהבהוב (מחשב + נייד) ---
-	let lockedName = null; 
-	let lastTouchTime = 0; // משתנה שזוכר מתי הייתה נגיעה במסך
-
-	// פונקציה מרכזית לניהול הבלטות
-	function updateHighlights(nameToHighlight) {
-		const allPersons = document.querySelectorAll('.person');
-		allPersons.forEach(el => {
-			if (nameToHighlight && el.textContent.trim() === nameToHighlight) {
-				el.classList.add('highlight-name');
-			} else {
-				el.classList.remove('highlight-name');
-			}
-		});
-	}
-
-	// זיהוי נגיעה במסך - חוסם אירועי עכבר מזויפים בנייד
-	document.addEventListener('touchstart', function() {
-		lastTouchTime = Date.now();
-	}, { passive: true });
-
-	// 1. מעבר עכבר (mouseover) - יתבצע רק במחשב (לא אחרי נגיעה)
-	document.addEventListener('mouseover', function (e) {
-		// אם עבר פחות מחצי שנייה מהנגיעה האחרונה - זה נייד, נתעלם
-		if (Date.now() - lastTouchTime < 500) return;
-
-		const personEl = e.target.closest('.person');
-		if (personEl && !lockedName) {
-			updateHighlights(personEl.textContent.trim());
-		}
-	});
-
-	// 2. יציאת עכבר (mouseout) - יתבצע רק במחשב
-	document.addEventListener('mouseout', function (e) {
-		if (Date.now() - lastTouchTime < 500) return;
-
-		if (!lockedName) {
-			updateHighlights(null);
-		}
-	});
-
-	// 3. לחיצה (click) - עובד מעולה גם בנייד וגם במחשב
-	document.addEventListener('click', function (e) {
-		const personEl = e.target.closest('.person');
-		
-		if (personEl) {
-			const clickedName = personEl.textContent.trim();
-			
-			if (lockedName === clickedName) {
-				// לחיצה חוזרת משחררת
-				lockedName = null;
-				updateHighlights(null);
-			} else {
-				// לחיצה ראשונה נועלת
-				lockedName = clickedName;
-				updateHighlights(clickedName);
-			}
-		} else {
-			// לחיצה על שטח ריק מנקה הכל
-			lockedName = null;
-			updateHighlights(null);
-		}
-	});
-	</script>
-	
 </body>
 </html>
