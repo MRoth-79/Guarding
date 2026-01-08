@@ -375,6 +375,81 @@
             background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--primary-blue), rgba(0, 0, 0, 0));
             margin: 30px 0;
         }
+		
+		.guard-selector-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-bottom: 15px;
+			justify-content: center;
+			background: #fff;
+			padding: 15px;
+			border-radius: 10px;
+			border: 1px solid var(--border-color);
+		}
+
+		.guard-btn {
+			background-color: #f0f4f7;
+			color: #37474f;
+			border: 1px solid #cfd8dc;
+			padding: 8px 16px;
+			border-radius: 20px;
+			cursor: pointer;
+			font-size: 14px;
+			transition: all 0.2s ease;
+			box-shadow: none;
+		}
+
+		.guard-btn:hover {
+			background-color: #e1f5fe;
+		}
+
+		/* מצב נבחר - צבע זהב/כחול בולט */
+		.guard-btn.active {
+			background-color: #FFC107 !important;
+			color: #212121 !important;
+			border-color: #FFA000;
+			font-weight: bold;
+			transform: scale(1.05);
+			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		}
+		
+		/* יצירת שורה שתכיל את שני האלמנטים זה לצד זה */
+		.editor-layout-row {
+			display: flex;
+			gap: 20px; /* רווח בין התיבה לכפתורים */
+			align-items: flex-start; /* הצמדה לחלק העליון */
+			margin-top: 20px;
+		}
+
+		/* הצרת אזור תיבת הטקסט */
+		.textarea-container {
+			flex: 2; /* יתפוס כ-65% מהרוחב */
+		}
+
+		/* עיצוב אזור בחירת השומרים ליד התיבה */
+		.guards-selection-side-panel {
+			flex: 1; /* יתפוס כ-35% מהרוחב */
+			background-color: #ffffff;
+			padding: 15px;
+			border-radius: 10px;
+			border: 1px solid var(--border-color);
+			box-shadow: var(--shadow);
+			position: sticky; /* יגרום לכפתורים "ללכת" איתך אם תגלול בטקסט */
+			top: 20px;
+		}
+
+		/* התאמת גובה התיבה כדי שלא תהיה ארוכה מדי */
+		#dataToAnalyze {
+			min-height: 600px; 
+			width: 100%;
+		}
+
+		/* התאמת כפתורי השומרים שיהיו קצת יותר קטנים בתצוגה הצדדית */
+		.guard-btn {
+			font-size: 13px;
+			padding: 6px 12px;
+		}
 
     </style>
 </head>
@@ -419,23 +494,27 @@
                 <br>
                 **אילוץ חמור:** לאחר משמרת 22:00-02:00 יש חסימה עד 14:00 למחרת. לאחר 02:00-06:00 יש חסימה עד 18:00 באותו יום.
             </p>
-            <textarea id="dataToAnalyze" 
-                title="נתוני משמרות לעריכה וניתוח"
-                placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
-            </p>
-            </textarea>
-			
-			<h3>עובדים ל-5 משמרות השבוע (חייבים להגיע ליעד) 🏆</h3>
-			<p class="file-format-info">הזן את שמות העובדים שצריכים להגיע ל-5 משמרות, מופרדים בפסיקים או בשורות חדשות.</p>
-			<textarea id="guardsFor5Shifts" style="min-height: 80px;" placeholder="לדוגמה: אסף, גולן, נמרוד, מאור"></textarea>
-            
-			<h3>חסימת משמרות ליווי (ימי חופש) 🏖️</h3>
-			<p class="file-format-info" style="padding-top:0; padding-bottom: 10px; margin-bottom: 10px;">
-				סמן ימים שבהם משמרת "ליווי 07:40" <b>אינה</b> נדרשת.
-			</p>
-			<div id="holidayChecklist" style="display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 10px; background-color: #f0f4f7; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 15px;">
-				</div>	
-			<hr style="margin: 20px 0;">
+			<div class="editor-layout-row">
+				
+				<div class="textarea-container">
+					<h3>נתוני משמרות לעריכה ומקור הנתונים 📝</h3>
+					<textarea id="dataToAnalyze" 
+						title="נתוני משמרות לעריכה וניתוח"
+						placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
+					</textarea>
+				</div>
+
+				<div class="guards-selection-side-panel">
+					<h3>בחירת שומרים ליעד של 5 משמרות 🏆</h3>
+					<p class="file-format-info" style="font-size: 0.85em; margin-bottom: 10px;">
+						לחץ על השומרים שחייבים להגיע ל-5 משמרות (עדיפות בשיבוץ):
+					</p>
+					<div id="guardButtonsContainer" class="guard-selector-container" style="box-shadow: none; border: 1px solid #eee; background: #fafafa;">
+						</div>
+					<textarea id="guardsFor5Shifts" style="display:none;"></textarea>
+				</div>
+
+			</div>
 			            
             <div id="button-group">
                 <button id="analyzeButton">נתח נתונים 🔍</button>
@@ -524,7 +603,7 @@
             
             const formattedDate = today.toISOString().split('T')[0];
             document.getElementById('startDate').value = formattedDate;
-
+			generateGuardsButtons();
             const savedUrl = localStorage.getItem('googleSheetUrl');
             if (savedUrl) {
                 document.getElementById('googleSheetUrl').value = savedUrl;
@@ -1265,119 +1344,99 @@
                 let shiftsFilledThisIteration = 0;
                 
                 // 4. פונקציית ניקוד מורכבת
-                function scoreEmployee(name, count, dayIndex, shiftIndex) {
-                    let score = 0;
-                    
-                    // 1. ציון לפי תדירות כוללת: עדיפות למי ששמר פחות
-                    score += (MAX_ALLOWED + 1) - count; 
+// בתוך פונקציית autoSchedule, תחת פונקציית scoreEmployee:
 
-                    // 2. **אכיפת מינימום דינמית (4 לרוב, 5 לנבחרים)**
-                    let personalMin = guardsFor5Set.has(name) ? 5 : MIN_REQUIRED;
+				function scoreEmployee(name, count, dayIndex, shiftIndex) {
+					let score = 0;
+					
+					// הגדרת יעד אישי
+					let personalTarget = guardsFor5Set.has(name) ? 5 : MIN_REQUIRED;
 
-					if (count < personalMin) { 
-						 score += 700 * (personalMin - count); // בונוס ענק להבטחת היעד למי שצריך 5
+					// 1. עדיפות קריטית למי שטרם הגיע ליעד שלו (ובמיוחד לאלו של 5 משמרות)
+					if (count < personalTarget) {
+						// בונוס משמעותי שמבטיח שהם ייבחרו לפני אחרים
+						score += 5000 * (personalTarget - count); 
+					}
+
+					// 2. עדיפות משנית למי ששמר פחות באופן כללי (לאיזון)
+					score += (MAX_ALLOWED - count) * 10;
+
+					// --- חסימות קריטיות (עונשים כבדים מאוד - מונעים שיבוץ לא חוקי) ---
+					
+					// חסימת כפילות יומית או הפרת מנוחת 8 שעות (חובה!)
+					if (dailyOccupancy[dayIndex].has(name) || daily8HourBreakRequired[dayIndex].has(name)) {
+						return -1000000; 
 					}
 					
-                    // --- עונשים קריטיים (מונעים שיבוץ) ---
-                    
-                    // 3. חסימה: כפילות יומית (בדיקה קלה) או רצף 8 שעות (בדיקה קלה)
-                    if (dailyOccupancy[dayIndex].has(name) || daily8HourBreakRequired[dayIndex].has(name)) {
-                        score -= 99999; 
-                    }
-                    
-                    // 4. חסימה: הפרת מנוחת לילה 22-02 -> יום למחרת (עד 14:00)
-                    if (night22_02_block[dayIndex].has(name) && (shiftIndex === MORNING_SHIFT_6_10_INDEX || shiftIndex === MORNING_SHIFT_10_14_INDEX)) {
-                         score -= 1000000; 
-                    }
+					// חסימות מנוחת לילה (החוקים הקשיחים שלך)
+					if (night22_02_block[dayIndex].has(name) && (shiftIndex === MORNING_SHIFT_6_10_INDEX || shiftIndex === MORNING_SHIFT_10_14_INDEX)) {
+						 return -2000000;
+					}
+					if (night02_06_block[dayIndex].has(name) && (shiftIndex <= AFTERNOON_SHIFT_14_18_INDEX)) {
+						 return -2000000;
+					}
 
-                    // 5. חסימה: הפרת מנוחת לילה 02-06 -> יום אותו יום (עד 18:00)
-                    if (night02_06_block[dayIndex].has(name) && (shiftIndex === MORNING_SHIFT_6_10_INDEX || shiftIndex === MORNING_SHIFT_10_14_INDEX || shiftIndex === AFTERNOON_SHIFT_14_18_INDEX)) {
-                         score -= 2000000; 
-                    }
+					// הגבלת מכסת מקסימום אבסולוטית (5)
+					if (count >= MAX_ALLOWED) {
+						return -500000;
+					}
 
-                    // 6. חסימה: רצף לילות 22-02 אתמול -> 02-06 היום
-                    if (shiftIndex === NIGHT_SHIFT_02_06_INDEX && dayIndex > 0) {
-                        const previousDayIndex = dayIndex - 1; 
-                        if (nightToMorningCheck[previousDayIndex] && nightToMorningCheck[previousDayIndex].has(name)) {
-                            score -= 600000; 
-                        }
-                    }
-
-					// 6.5. חסימה: יותר ממשמרת ליווי אחת בשבוע
-                    if (shiftIndex === ASSIST_SHIFT_INDEX && assistanceShiftsDone.has(name)) {
-                        score -= 5000000; // עונש כבד מאוד למניעת שיבוץ
-                    }
-
-                    // --- עונשים רגילים ---
-					
-                    // 7. עונש על חריגה מהמקסימום (4)
-                    if (count >= MAX_ALLOWED) {
-                         score -= 5000; 
-                    }
-                    
-					// **חדש: עדכון מעקב ליווי לאחר שיבוץ אוטומטי**
-                     if (shiftIndex === ASSIST_SHIFT_INDEX) {
-                         assistanceShiftsDone.add(name);
-                     }
-					
-                    // 8. אכיפת הגבלת משמרת לילה 02:00-06:00 (מכסה שבועית)
-                    if (shiftIndex === NIGHT_SHIFT_2_6_INDEX) {
-                        const currentNightCount = nightShift2to6Count[name] || 0;
-                        if (currentNightCount >= MAX_NIGHT_2_6) {
-                            score -= 20000; 
-                        }
-                    }
-                    
-                    
-                    return score;
-                }
+					return score;
+				}
 
                 // 5. מילוי המשמרות החסרות
-                shiftsToFill.forEach(shift => {
+                // --- מילוי המשמרות החסרות (לוגיקה מעודכנת בשני סבבים) ---
+
+                // פונקציית עזר פנימית לביצוע השיבוץ בפועל
+                function fillShiftLogic(shift, onlyGuardsFor5) {
                     const { dayIndex, shiftIndex, requiredCount } = shift;
-                    const availableInSlot = Array.from(availabilityMap[dayIndex][shiftIndex]);
+                    const isNightShift = EXPECTED_TIME_SLOTS[shiftIndex].includes('(Night)');
+                    const maxInShift = isNightShift ? 2 : 1;
                     
-                    const alreadyAssignedToSlot = new Set(newScheduleData[shiftIndex][dayIndex]);
-                    let filteredCandidates = availableInSlot.filter(name => !alreadyAssignedToSlot.has(name)); 
+                    // אם המשמרת כבר התמלאה בסבב הקודם, דלג
+                    if (newScheduleData[shiftIndex][dayIndex].length >= maxInShift) {
+                        return;
+                    }
 
-                    let needed = requiredCount;
-                    while (needed > 0) {
-                        
-                        if (filteredCandidates.length === 0) { break; }
+                    const availableInSlot = Array.from(availabilityMap[dayIndex][shiftIndex]);
+                    const alreadyAssigned = new Set(newScheduleData[shiftIndex][dayIndex]);
+                    
+                    // סינון מועמדים לפי הסבב הנוכחי
+                    let filteredCandidates = availableInSlot.filter(name => !alreadyAssigned.has(name));
+                    
+                    if (onlyGuardsFor5) {
+                        // בסבב הראשון, משאירים רק את השומרים שסומנו בצהוב
+                        filteredCandidates = filteredCandidates.filter(name => guardsFor5Set.has(name));
+                    }
 
+                    let needed = maxInShift - newScheduleData[shiftIndex][dayIndex].length;
+                    
+                    while (needed > 0 && filteredCandidates.length > 0) {
                         const scoredCandidates = filteredCandidates.map(name => {
                             const currentCount = employeeShiftsCount[name] || 0;
-                            const score = scoreEmployee(name, currentCount, dayIndex, shiftIndex); 
-                            return { name, score, count: currentCount };
+                            const score = scoreEmployee(name, currentCount, dayIndex, shiftIndex);
+                            return { name, score };
                         });
 
                         scoredCandidates.sort((a, b) => b.score - a.score);
-
                         const bestCandidate = scoredCandidates[0];
-                        
-                        // בדיקה קריטית: אם הציון הגבוה ביותר עדיין שלילי בצורה מוחצת, זה אומר שאין פתרון תקין
-                        if (bestCandidate && bestCandidate.score > -90000) { 
+
+                        // בדיקה שהמועמד חוקי (לא מפר חוקי מנוחה קשים)
+                        if (bestCandidate && bestCandidate.score > -90000) {
                             const name = bestCandidate.name;
-                            
-                            // שיבוץ העובד ועדכון ספירות
                             newScheduleData[shiftIndex][dayIndex].push(name);
-                            shiftsFilledThisIteration++; 
-                            
-                            // *** ספירה רק אם זו לא משמרת ליווי ***
                             employeeShiftsCount[name]++;
+                            dailyOccupancy[dayIndex].add(name);
                             
-                            dailyOccupancy[dayIndex].add(name); 
-                            
-                            // *** עדכוני חסימות והפרות ***
-                            if (shiftIndex === NIGHT_SHIFT_2_6_INDEX) { 
-                                nightShift2to6Count[name] = (nightShift2to6Count[name] || 0) + 1; 
-                                night02_06_block[dayIndex].add(name); 
+                            // עדכון מעקב חסימות
+                            if (shiftIndex === NIGHT_SHIFT_2_6_INDEX) {
+                                nightShift2to6Count[name] = (nightShift2to6Count[name] || 0) + 1;
+                                night02_06_block[dayIndex].add(name);
                             }
-                            
-                            if (shiftIndex === NIGHT_SHIFT_22_2_INDEX) { 
-                                nightToMorningCheck[dayIndex].add(name); 
+                            if (shiftIndex === NIGHT_SHIFT_22_2_INDEX) {
+                                nightToMorningCheck[dayIndex].add(name);
                                 if (dayIndex + 1 < initialParsedData.days.length) {
-                                    night22_02_block[dayIndex + 1].add(name); 
+                                    night22_02_block[dayIndex + 1].add(name);
                                 }
                             }
 
@@ -1386,15 +1445,19 @@
                                 daily8HourBreakRequired[dayIndex].add(name);
                             }
 
-                            const indexToRemove = filteredCandidates.indexOf(name);
-                            if (indexToRemove > -1) { filteredCandidates.splice(indexToRemove, 1); }
-                            
+                            filteredCandidates = filteredCandidates.filter(n => n !== name);
                             needed--;
                         } else {
                             break;
                         }
                     }
-                });
+                }
+
+                // הרצת סבב 1: עדיפות מוחלטת לשומרים שחייבים 5 משמרות
+                shiftsToFill.forEach(shift => fillShiftLogic(shift, true));
+
+                // הרצת סבב 2: מילוי שאר המשבצות עם שאר העובדים
+                shiftsToFill.forEach(shift => fillShiftLogic(shift, false));
 
                 // 6. בדיקת תנאי עצירה - האם כולם עמדו במינימום?
                 const employeesBelowMin = allEmployees.filter(name => employeeShiftsCount[name] < MIN_REQUIRED);
@@ -1571,7 +1634,30 @@
                 document.getElementById('fetchFromSheetButton').disabled = false;
             }
         }
+		
+		// --- פונקציות ניהול כפתורי שומרים (הוספה חדשה) ---
+        function generateGuardsButtons() {
+            const container = document.getElementById('guardButtonsContainer');
+            if (!container) return;
+            container.innerHTML = ''; 
+            Object.keys(colorMap).forEach(name => {
+                const btn = document.createElement('button');
+                btn.textContent = name;
+                btn.className = 'guard-btn';
+                btn.type = 'button';
+                btn.onclick = function() {
+                    this.classList.toggle('active');
+                    updateGuardsTextarea();
+                };
+                container.appendChild(btn);
+            });
+        }
 
+        function updateGuardsTextarea() {
+            const activeButtons = document.querySelectorAll('.guard-btn.active');
+            const selectedNames = Array.from(activeButtons).map(btn => btn.textContent);
+            document.getElementById('guardsFor5Shifts').value = selectedNames.join(', ');
+        }
 
         // --- קישור אירועים לכפתורים ---
         
