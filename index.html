@@ -4,383 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מנתח טבלת משמרות שבועית 📅</title>
-    <style>
-        /* ** עיצוב גלובלי ומודרני ** */
-        :root {
-            --primary-blue: #00796B; 
-            --secondary-blue: #4DB6AC; 
-            --light-bg-color: #F8FBFB; 
-            --accent-red: #D32F2F; 
-            --btn-analyze: #388E3C; 
-            --btn-download: #546E7A; 
-            --btn-generate: #1976D2; 
-            --btn-reset: #E53935; 
+	<style>
+		/* =========================================
+		   1. משתנים גלובליים והגדרות בסיס
+		   ========================================= */
+		:root {
+			--primary-blue: #00796B; 
+			--secondary-blue: #4DB6AC; 
+			--light-bg-color: #F8FBFB; 
+			--accent-red: #D32F2F; 
+			--btn-analyze: #388E3C; 
+			--btn-download: #546E7A; 
+			--btn-generate: #1976D2; 
+			--btn-reset: #E53935; 
 			--btn-auto: #00A896; 
-            --text-color: #212121;
-            --border-color: #E0E0E0;
-            --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            --summary-header: #37474F;
+			--text-color: #212121;
+			--border-color: #E0E0E0;
+			--shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+			--summary-header: #37474F;
 			--exception-bg: #FFF3E0;
 			--exception-text: #E65100;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: right;
-            direction: rtl;
-            background-color: var(--light-bg-color);
-            color: var(--text-color);
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        h2, h3 {
-            color: var(--primary-blue);
-            text-align: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* ** עיצוב כפתורים ** */
-        button {
-            border: none;
-            padding: 12px 25px;
-            margin: 5px;
-            border-radius: 8px; 
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        button:hover:not(:disabled) {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
-        }
-        
-        button:disabled {
-            background-color: #cccccc !important;
-            cursor: not-allowed;
-        }
-
-        #analyzeButton { background-color: var(--btn-analyze); }
-        #downloadButton { background-color: var(--btn-download); }
-        #generateLinkButton { background-color: var(--btn-generate); }
-        #resetButton { background-color: var(--btn-reset); }
-        
-        /* ** מיקום ועיצוב כפתור הסדר הראשי ** */
-        #main-button-wrapper {
-            text-align: center;
-            margin: 30px auto;
-        }
-
-        #autoScheduleButton { 
-            background-color: var(--btn-auto); 
-            padding: 15px 40px;
-            font-size: 19px;
-            box-shadow: 0 6px 15px rgba(26, 35, 126, 0.6); 
-            max-width: 400px;
-            width: 100%;
-			color: white;
-        }
-		
-		#autoScheduleButton:not(:disabled) {
-			background-color: var(--btn-auto) !important; /* דורס את כל ה-CSS האחר של disabled */
-			color: white !important;
-}
-		
-        #button-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        /* ** אזור קלט ** */
-        #data-source-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 1000px;
-            padding: 15px;
-            margin-top: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 14px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-
-        .date-input-container {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        #startDate {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        
-        .file-format-info {
-            text-align: center;
-            color: #777;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #f0f4f7;
-            border-radius: 5px;
-        }
-
-        /* ** עיצוב טבלת המשמרות ** */
-        #schedule-table {
-            width: auto;
-			display: table;
-            border-collapse: collapse;
-            margin: 20px auto;
-            box-shadow: var(--shadow);			
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: white;
-        }
-
-        #schedule-table th, #schedule-table td {
-            border: 1px solid var(--border-color);
-            padding: 12px 8px;
-            text-align: center;
-            min-width: 145px;
-			font-size: 20px;
-        }
-
-        #schedule-table thead {
-            background-color: var(--primary-blue);
-            color: white;
-            border-bottom: 3px solid var(--secondary-blue);
-        }
-
-        /* סגנון ליווי */
-        .red-assistance-shift {
-            background-color: #FFF9C4 !important; 
-            color: #FBC02D; 
-            font-weight: bold;
-        }
-        .red-assistance-shift td {
-            border: 1px solid var(--border-color);
-        }
-
-        /* סגנון עמודת השעות */
-        .time-slot {
-            background-color: var(--secondary-blue);
-            color: white;
-            font-weight: bold;
-			font-size: 20px;
-        }
-		
-		#schedule-table thead tr th:first-child { 
-			background-color: #FFC107; /* צהוב בולט */ 
-			color: #212121; /* טקסט כהה על רקע צהוב */ 
-			border-color: #FBC02D; 
-		}
-		
-
-		/* עיצוב שמות העובדים - מעודכן להופעה אנכית */
-        .person {
-            display: block; /* גורם לכל שם לתפוס שורה שלמה (שם מעל שם) */
-            width: fit-content; /* שומר על הבועה בגודל הטקסט ולא נמתח לכל הרוחב */
-            margin: 5px auto; /* מרכז את השם בתוך המשבצת ומוסיף רווח קטן ביניהם */
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 1.3em;
-            font-weight: 600;
-            cursor: help;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.25);
-        }
-        
-        .person:hover {
-            transform: scale(1.05);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-        }
-        
-		 /* ** מפת צבעים מודרנית לשמות (22 שומרים ייחודיים) ** */
-		.color-אמיר { background-color: #BBDEFB !important; color: #0D47A1; } /* ורוד בהיר */
-		.color-נמרוד { background-color: #e1f5fe; color: #0277bd; } /* כחול בהיר */
-		.color-יובי { background-color: #fff8e1; color: #ff8f00; } /* צהוב חם */
-		.color-טגניה { background-color: #e8f5e9; color: #2e7d32; } /* ירוק בהיר */
-		.color-ישי { background-color: #f3e5f5; color: #6a1b9a; } /* סגול לילך */
-		.color-גולן { background-color: #fbe9e7; color: #bf360c; } /* כתום אדמדם */
-		.color-חסון { background-color: #e0f2f1; color: #00838f; } /* טורקיז חזק */
-		.color-לישע { background-color: #C8E6C9; color: #000000; } /* ירוק זית */
-		.color-עידן { background-color: #eceff1; color: #D81B60; } /* אפור כחול */
-		.color-חגי { background-color: #fff3e0; color: #e65100; } /* כתום דבש */
-		.color-סתיו { background-color: #FFFF00; color: #0000FF; } /* תכלת ימי */
-		.color-אסף { background-color: #FFECB3; color: #c62828; } /* אדום בהיר */
-		.color-ליאני { background-color: #e3f2fd; color: #1565c0; } /* כחול כהה */
-		.color-נתי { background-color: #f9fbe7; color: #afb42b; } /* ירוק ליים */
-		.color-ערן { background-color: #e8eaf6; color: #3949ab; } /* כחול לבנדר */
-		.color-מאור { background-color: #FFFDE7; color: #212121; } /* אפור כהה (נייטרלי) */
-		.color-ניר { background-color: #FF0000; color: #FFFFFF; } /* חום קפה */
-		.color-חורחה { background-color: #fce4ec; color: #d81b60; } /* ורוד פוקסיה */
-		.color-שלומי { background-color: #e0f2f1; color: #004d40; } /* ירוק יער */
-		.color-יפתח { background-color: #f0f4c3; color: #827717; } /* ירוק חרדל */
-		.color-חברוני { background-color: #c8e6c9; color: #33691e; } /* ירוק דשא */
-		.color-ויקטור { background-color: #fff9c4; color: #f9a825; } /* צהוב זהב */
-		
-
-        /* ** עיצוב תאי אזהרה ** */
-        .needs-selection { background-color: #FFFDE7; border: 2px dashed #FFCA28; } 
-        .daily-duplicate-warning, .night-rest-violation-warning { 
-            background-color: #FFCDD2; 
-            border: 2px dashed var(--accent-red);
-        }
-        .warning-text {
-            color: var(--accent-red);
-        }
-		
-		/* **חדש: עיצוב משמרת מבוטלת** */
-        .disabled-shift {
-            background-color: #ECEFF1 !important;
-            border: 1px dashed #B0BEC5;
-        }
-
-        /* ** עיצוב טבלת הסיכום - מודרנית ** */
-        #summary-table {
-            width: 90%; 
-            margin: 20px auto;
-            border-collapse: collapse;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
-            font-size: 0.95em;
-        }
-        
-        #summary-table th, #summary-table td {
-            padding: 14px 10px;
-            border: none; /* הסרת הגבולות הפנימיים לטובת עיצוב נקי */
-        }
-        
-        #summary-table thead {
-            background-color: var(--summary-header); 
-            color: white;
-        }
-
-        #summary-table tbody tr {
-            border-bottom: 1px solid #ECEFF1;
-            transition: background-color 0.3s;
-        }
-
-        #summary-table tbody tr:hover {
-            background-color: #F5F5F5;
-        }
-        
-		/* סגנונות שורות הסיכום */
-		.low-shifts { background-color: #FBECEC; color: var(--accent-red); font-weight: bold; } 
-		.shifts-3-count { background-color: #E8F5E9; color: #388E3C; } 
-		.shifts-4-count { background-color: #C8E6C9; color: #1B5E20; font-weight: bold; } 
-		.night-limit-fail-row { background-color: #FFEBEE; } 
-
-		/* שורת 5 משמרות - כחול */
-		.shifts-5-count { 
-			background-color: #E3F2FD !important; 
-			color: #0D47A1 !important; 
-			font-weight: bold; 
-			border-right: 6px solid #1976D2; 
+			--saturday-peach: #FFAB91;
+			--saturday-bg: #FFF3E0;
 		}
 
-		/* הבלטה (Hover) לכל סוגי השורות - כדי שהכל יגיב לעכבר */
-		.shifts-5-count:hover { background-color: #BBDEFB !important; cursor: pointer; }
-		.shifts-4-count:hover { background-color: #A5D6A7 !important; cursor: pointer; }
-		.low-shifts:hover { background-color: #FFCDD2 !important; cursor: pointer; }
-		
-		/* הבלטה ששומרת על צבע המקור והופכת אותו לזוהר */
-        .highlight-name {
-            transform: scale(1.3) !important; /* הגדלה משמעותית */
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5) !important; /* צל שמקפיץ את השם החוצה */
-            border: 2px solid #000 !important; /* מסגרת שחורה חדה */
-            z-index: 1000 !important;
-            position: relative !important;
-            /* גורם לצבע הרקע המקורי להיות בהיר וזוהר יותר */
-            filter: brightness(1.2) contrast(1.1) !important; 
-            transition: all 0.1s ease;
-        }
-        
-        .night-limit-fail { color: var(--accent-red); font-weight: bold; }
-        .night-limit-ok { color: #388E3C; } /* ירוק לאישור */
-
-        /* הודעת מערכת */
-        #link-message {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px 40px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            font-size: 1.1em;
-            text-align: center;
-        }
-		/* עיצוב טבלת החריגות */
-		#exceptions-table {
-			width: 90%; 
-			margin: 20px auto;
-			border-collapse: collapse;
-			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-			border-radius: 12px;
-			overflow: hidden;
-			background-color: white;
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			text-align: right;
+			direction: rtl;
+			background-color: var(--light-bg-color);
+			color: var(--text-color);
+			padding: 20px;
+			line-height: 1.6;
 		}
 
-		#exceptions-table thead {
-			background-color: #E65100; /* צבע כתום אזהרה */
-			color: white;
+		.container {
+			max-width: 98%; /* פריסה רחבה על כל המסך */
+			margin: 0 auto;
 		}
 
-		#exceptions-table td, #exceptions-table th {
-			padding: 12px;
+		h2, h3 {
+			color: var(--primary-blue);
 			text-align: center;
-			border-bottom: 1px solid #FFE0B2;
+			border-bottom: 2px solid var(--border-color);
+			padding-bottom: 10px;
+			margin-bottom: 20px;
 		}
 
-		#exceptions-table tbody tr {
-			background-color: var(--exception-bg);
-			color: var(--exception-text);
+		/* =========================================
+		   2. עיצוב כפתורים וממשק
+		   ========================================= */
+		button {
+			border: none;
+			padding: 12px 25px;
+			margin: 5px;
+			border-radius: 8px; 
+			cursor: pointer;
+			font-size: 16px;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+			color: white;
+			text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+		}
+
+		button:hover:not(:disabled) {
+			opacity: 0.9;
+			transform: translateY(-2px);
+			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 		}
 		
-        hr {
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--primary-blue), rgba(0, 0, 0, 0));
-            margin: 30px 0;
-        }
-		
+		button:disabled {
+			background-color: #cccccc !important;
+			cursor: not-allowed;
+		}
+
+		#analyzeButton { background-color: var(--btn-analyze); }
+		#downloadButton { background-color: var(--btn-download); }
+		#generateLinkButton { background-color: var(--btn-generate); }
+		#resetButton { background-color: var(--btn-reset); }
+		#autoScheduleButton { background-color: var(--btn-auto); padding: 15px 40px; font-size: 19px; width: 100%; max-width: 400px; }
+
+		/* כפתורי בחירת שומרים (פאנל צדי) */
 		.guard-selector-container {
 			display: flex;
 			flex-wrap: wrap;
 			gap: 8px;
-			margin-bottom: 15px;
 			justify-content: center;
 			background: #fff;
 			padding: 15px;
@@ -395,16 +104,10 @@
 			padding: 8px 16px;
 			border-radius: 20px;
 			cursor: pointer;
-			font-size: 14px;
+			font-size: 13px;
 			transition: all 0.2s ease;
-			box-shadow: none;
 		}
 
-		.guard-btn:hover {
-			background-color: #e1f5fe;
-		}
-
-		/* מצב נבחר - צבע זהב/כחול בולט */
 		.guard-btn.active {
 			background-color: #FFC107 !important;
 			color: #212121 !important;
@@ -413,45 +116,213 @@
 			transform: scale(1.05);
 			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 		}
-		
-		/* יצירת שורה שתכיל את שני האלמנטים זה לצד זה */
+
+		/* =========================================
+		   3. אזורי קלט ופריסת עורך (Side-by-Side)
+		   ========================================= */
 		.editor-layout-row {
 			display: flex;
-			gap: 20px; /* רווח בין התיבה לכפתורים */
-			align-items: flex-start; /* הצמדה לחלק העליון */
+			gap: 20px;
+			align-items: flex-start;
 			margin-top: 20px;
 		}
 
-		/* הצרת אזור תיבת הטקסט */
 		.textarea-container {
-			flex: 2; /* יתפוס כ-65% מהרוחב */
+			flex: 2; /* אזור הטקסט תופס יותר מקום */
 		}
 
-		/* עיצוב אזור בחירת השומרים ליד התיבה */
 		.guards-selection-side-panel {
-			flex: 1; /* יתפוס כ-35% מהרוחב */
+			flex: 1;
 			background-color: #ffffff;
 			padding: 15px;
 			border-radius: 10px;
 			border: 1px solid var(--border-color);
 			box-shadow: var(--shadow);
-			position: sticky; /* יגרום לכפתורים "ללכת" איתך אם תגלול בטקסט */
+			position: sticky;
 			top: 20px;
 		}
 
-		/* התאמת גובה התיבה כדי שלא תהיה ארוכה מדי */
-		#dataToAnalyze {
-			min-height: 600px; 
+		textarea {
 			width: 100%;
+			min-height: 600px;
+			padding: 15px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			font-family: monospace;
+			font-size: 14px;
+			box-sizing: border-box;
+			resize: vertical;
 		}
 
-		/* התאמת כפתורי השומרים שיהיו קצת יותר קטנים בתצוגה הצדדית */
-		.guard-btn {
-			font-size: 13px;
-			padding: 6px 12px;
+		/* =========================================
+		   4. טבלת המשמרות הראשית
+		   ========================================= */
+		#results-container {
+			width: 100%;
+			margin-top: 20px;
+			overflow-x: auto; /* מאפשר גלילה רק אם המסך ממש קטן */
+			padding: 10px;
+			box-sizing: border-box;
 		}
 
-    </style>
+		#schedule-table {
+			width: 100%;
+			max-width: 1600px;
+			margin: 0 auto !important;
+			border-collapse: collapse;
+			background-color: white;
+			box-shadow: var(--shadow);
+			border-radius: 10px;
+			overflow: hidden;
+			table-layout: fixed; /* מבטיח חלוקה שווה של העמודות */
+		}
+
+		#schedule-table th, #schedule-table td {
+			border: 1px solid var(--border-color);
+			padding: 12px 8px;
+			text-align: center;
+			font-size: 18px;
+			/* תוספות למניעת קפיצות */
+			height: 70px;            /* קיבוע גובה אחיד לכל התאים */
+			vertical-align: middle;
+			overflow: visible !important; /* מאפשר לשם לגדול בלי להזיז את התא */
+		}
+
+		#schedule-table thead {
+			background-color: var(--primary-blue);
+			color: white;
+		}
+
+		/* עמודת השעות */
+		.time-slot {
+			background-color: var(--secondary-blue);
+			color: white;
+			font-weight: bold;
+			direction: ltr !important; /* תיקון הצגת שעות 02:00-06:00 */
+		}
+
+		/* --- הדגשת סוף שבוע (שבת) באפרסק --- */
+		/* יום שבת הוא עמודה 7 (כולל עמודת השעות) */
+		#schedule-table th:nth-child(7) {
+			background-color: var(--saturday-peach) !important;
+			color: #212121 !important;
+		}
+		#schedule-table td:nth-child(7) {
+			background-color: var(--saturday-bg) !important;
+		}
+
+		/* אופציונלי: יום ראשון (העמודה האחרונה) בצבע נייטרלי עדין */
+		#schedule-table td:last-child {
+			padding-left: 20px;
+		}
+
+		/* =========================================
+		   5. שמות שומרים (בועות) וצבעים
+		   ========================================= */
+		.person {
+			display: block;
+			width: fit-content;
+			margin: 5px auto;
+			padding: 4px 12px;
+			border-radius: 20px;
+			font-size: 1.1em;
+			font-weight: 600;
+			transition: all 0.2s;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		}
+
+		.person:hover {
+			transform: scale(1.1);
+			z-index: 10;
+		}
+
+		.highlight-name {
+			transform: scale(1.15) !important; /* הגדלה מתונה יותר למניעת עיוות */
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.5) !important;
+			
+			/* שימוש ב-outline מבטיח שהטבלה לא תזוז מילימטר */
+			outline: 3px solid #000 !important;
+			outline-offset: 1px;
+			
+			z-index: 1000 !important;
+			position: relative !important;
+			filter: brightness(1.2) contrast(1.1) !important;
+			transition: transform 0.1s ease;
+		}
+
+		/* מפת צבעים בסיסית לשמות */
+		.color-אמיר { background-color: #BBDEFB !important; color: #0D47A1; }
+		.color-נמרוד { background-color: #e1f5fe; color: #0277bd; }
+		.color-יובי { background-color: #fff8e1; color: #ff8f00; }
+		/* ... שאר צבעי השמות שלך יבואו כאן ... */
+		
+		/* ** מפת צבעים לכל 22 השומרים ** */
+		.color-אמיר { background-color: #BBDEFB !important; color: #0D47A1; } 
+		.color-נמרוד { background-color: #e1f5fe; color: #0277bd; } 
+		.color-יובי { background-color: #fff8e1; color: #ff8f00; } 
+		.color-טגניה { background-color: #e8f5e9; color: #2e7d32; } 
+		.color-ישי { background-color: #f3e5f5; color: #6a1b9a; } 
+		.color-גולן { background-color: #fbe9e7; color: #bf360c; } 
+		.color-חסון { background-color: #e0f2f1; color: #00838f; } 
+		.color-לישע { background-color: #C8E6C9; color: #000000; } 
+		.color-עידן { background-color: #eceff1; color: #D81B60; } 
+		.color-חגי { background-color: #fff3e0; color: #e65100; } 
+		.color-סתיו { background-color: #FFFF00; color: #0000FF; } 
+		.color-אסף { background-color: #FFECB3; color: #c62828; } 
+		.color-ליאני { background-color: #e3f2fd; color: #1565c0; } 
+		.color-נתי { background-color: #f9fbe7; color: #afb42b; } 
+		.color-ערן { background-color: #e8eaf6; color: #3949ab; } 
+		.color-מאור { background-color: #FFFDE7; color: #212121; } 
+		.color-ניר { background-color: #FF0000; color: #FFFFFF; } 
+		.color-חורחה { background-color: #fce4ec; color: #d81b60; } 
+		.color-שלומי { background-color: #e0f2f1; color: #004d40; } 
+		.color-יפתח { background-color: #f0f4c3; color: #827717; } 
+		.color-חברוני { background-color: #c8e6c9; color: #33691e; } 
+		.color-ויקטור { background-color: #fff9c4; color: #f9a825; }
+
+		/* =========================================
+		   6. טבלאות סיכום וחריגות
+		   ========================================= */
+		#summary-table, #exceptions-table {
+			width: 95%;
+			margin: 30px auto;
+			border-collapse: collapse;
+			box-shadow: var(--shadow);
+			border-radius: 12px;
+			overflow: hidden;
+		}
+
+		#summary-table thead { background-color: var(--summary-header); color: white; }
+		#exceptions-table thead { background-color: #E65100; color: white; }
+
+		#summary-table td, #summary-table th, 
+		#exceptions-table td, #exceptions-table th {
+			padding: 14px;
+			text-align: center;
+		}
+
+		/* סטטוסים בסיכום */
+		.shifts-5-count { background-color: #E3F2FD !important; color: #0D47A1 !important; font-weight: bold; border-right: 6px solid #1976D2; }
+		.shifts-4-count { background-color: #C8E6C9; color: #1B5E20; }
+		.low-shifts { background-color: #FBECEC; color: var(--accent-red); font-weight: bold; }
+
+		/* =========================================
+		   7. התאמה לנייד
+		   ========================================= */
+		@media (max-width: 1024px) {
+			.editor-layout-row {
+				flex-direction: column;
+			}
+			.guards-selection-side-panel {
+				position: static;
+				width: 100%;
+			}
+			#schedule-table {
+				display: block;
+				overflow-x: auto;
+			}
+		}
+	</style>
 </head>
 <body onload="initializeData(); document.getElementById('analyzeButton').click();">
 
@@ -500,7 +371,7 @@
 					<h3>נתוני משמרות לעריכה ומקור הנתונים 📝</h3>
 					<textarea id="dataToAnalyze" 
 						title="נתוני משמרות לעריכה וניתוח"
-						placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום\nשעות	עובד1	עובד2...)">
+						placeholder="הדבק את נתוני המשמרות כאן (פורמט: יום שני\nשעות עובד1 עובד2...)">
 					</textarea>
 				</div>
 
@@ -552,7 +423,7 @@
         const MAX_ALLOWED = 5;
         const MAX_NIGHT_2_6 = 2; // מקסימום שמירות בשעות 02:00-06:00
         const MAX_ITERATIONS = 10; // מספר ניסיונות סידור אוטומטי
-        const EXPECTED_DAYS = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
+        const EXPECTED_DAYS = ['יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת', 'יום ראשון'];
         
         const EXPECTED_TIME_SLOTS = [
             'ליווי 07:40 (Assist)',      // 0
@@ -590,26 +461,31 @@
         };
 
         /**
-         * פונקציה לאתחול הנתונים והצבת תאריך יום ראשון (היום הנוכחי)
+         * פונקציה לאתחולנים והצבת תאריך יום ראשון (היום הנוכחי)
          */
-        function initializeData() {
-            document.getElementById('dataToAnalyze').value = INITIAL_SCHEDULE_DATA; 
-            
-            const today = new Date();
-            let dayOfWeek = today.getDay(); 
-            if (dayOfWeek !== 0) {
-                today.setDate(today.getDate() - dayOfWeek); 
-            }
-            
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('startDate').value = formattedDate;
+		function initializeData() {
+			document.getElementById('dataToAnalyze').value = INITIAL_SCHEDULE_DATA; 
+			
+			const today = new Date();
+			let dayOfWeek = today.getDay(); // 0 = ראשון, 1 = שני...
+			
+			// חישוב המרחק מיום שני: 
+			// אם היום יום ראשון (0), נחזור 6 ימים אחורה. אחרת, נחזור ליום שני של השבוע הנוכחי.
+			let diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+			today.setDate(today.getDate() - diffToMonday);
+			
+			const formattedDate = today.toISOString().split('T')[0];
+			document.getElementById('startDate').value = formattedDate;
+
+			const savedUrl = localStorage.getItem('googleSheetUrl');
+			if (savedUrl) {
+				document.getElementById('googleSheetUrl').value = savedUrl;
+			}
+			
+			// יצירת הכפתורים והצ'קליסט מחדש לפי הסדר החדש
 			generateGuardsButtons();
-            const savedUrl = localStorage.getItem('googleSheetUrl');
-            if (savedUrl) {
-                document.getElementById('googleSheetUrl').value = savedUrl;
-            }
-			generateGuardsChecklist();
-        }
+			generateHolidayChecklist(); 
+		}
 
 /**
  * פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי) - *** עם תיקון רוחב אחיד ***
@@ -622,8 +498,8 @@
 			// Use the existing EXPECTED_DAYS constant
 			EXPECTED_DAYS.forEach((day, index) => {
 				const checkId = `check-holiday-${index}`;
-				// יום שבת (index 6) מושבת כברירת מחדל
-				const isDisabled = (index === 6); 
+				// יום שבת (index 5) מושבת כברירת מחדל
+				const isDisabled = (index === 5); 
 				
 				// --- התיקון כאן ---
 				// 1. קבענו 'width: 120px' (במקום min-width) לרוחב אחיד
@@ -715,7 +591,7 @@
             const daysFound = Object.keys(rawDayData);
             
             if (daysFound.length === 0) {
-                return { error: 'לא נמצאו נתונים תקינים או שלא זוהו ימים בפורמט נכון. ודא שהנתונים מתחילים ב"יום ראשון".' };
+                return { error: 'לא נמצאו נתונים תקינים או שלא זוהו ימים בפורמט נכון. ודא שהנתונים מתחילים ב"יום שני".' };
             }
 
             const scheduleTable = []; 
