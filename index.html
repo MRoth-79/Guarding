@@ -361,6 +361,51 @@
 			color: white !important;
 		}
 		
+		/* =========================================
+		   9. עיצוב בחירת תאריך (עדין וקומפקטי)
+		   ========================================= */
+		.date-input-container {
+			margin: 20px auto;
+			text-align: center;
+			background: #ffffff;
+			padding: 15px;
+			border-radius: 10px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* צל עדין מאוד */
+			max-width: 380px; /* רוחב מצומצם */
+			border: 1px solid var(--border-color);
+		}
+
+		.date-input-container label {
+			font-size: 18px; /* גודל טקסט מעודן */
+			font-weight: 600;
+			color: var(--text-color);
+			display: block;
+			margin-bottom: 8px;
+		}
+
+		.date-input-container input[type="date"] {
+			font-size: 16px; 
+			padding: 8px 12px;
+			border: 1px solid var(--border-color);
+			border-radius: 6px;
+			outline: none;
+			cursor: pointer;
+			font-family: inherit;
+			color: var(--text-color);
+			transition: all 0.2s ease;
+		}
+
+		/* אפקט קטן במעבר עכבר */
+		.date-input-container input[type="date"]:hover {
+			border-color: var(--secondary-blue);
+			background-color: #f9fbfb;
+		}
+
+		.date-input-container input[type="date"]:focus {
+			border-color: var(--primary-blue);
+			box-shadow: 0 0 5px rgba(0, 121, 107, 0.15);
+		}
+		
 	</style>
 </head>
 <body onload="initializeData(); document.getElementById('analyzeButton').click();">
@@ -397,13 +442,6 @@
                 <input type="date" id="startDate" required>
             </div>
             
-            <p class="file-format-info">
-                הנתונים שהוזנו כאן ישמשו לניתוח. **הסידור האוטומטי יתחשב רק בעובדים שרשמתם כאופציה לכל משבצת!**
-                
-                **הערה חשובה:** משבצת 'ליווי 07:40' מאפשרת הזנה ידנית בלבד ואינה נכללת בסידור האוטומטי.
-                <br>
-                **אילוץ חמור:** לאחר משמרת 22:00-02:00 יש חסימה עד 14:00 למחרת. לאחר 02:00-06:00 יש חסימה עד 18:00 באותו יום.
-            </p>
 			<div class="editor-layout-row">
 				
 				<div class="textarea-container">
