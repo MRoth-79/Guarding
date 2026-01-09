@@ -270,7 +270,19 @@
 		.color-סתיו { background-color: #FFFF00; color: #0000FF; } 
 		.color-אסף { background-color: #FFECB3; color: #c62828; } 
 		.color-ליאני { background-color: #7E57C2 !important; color: #ffffff !important; }
-		.color-נתי { background-color: #f9fbe7; color: #afb42b; } 
+		.color-נתי {
+			background-color: transparent !important; /* מבטל את הרקע של הבועה */
+			box-shadow: none !important;            /* מבטל את הצללית */
+			font-size: 0 !important;               /* מעלים את הטקסט "נתי" */
+			cursor: help;
+		}
+
+		.color-נתי::before {
+			content: "🐍";                          /* מציג ציור של נחש */
+			font-size: 28px;                       /* קובע את גודל הנחש */
+			display: inline-block;
+			visibility: visible;
+		}
 		.color-ערן { background-color: #e8eaf6; color: #3949ab; } 
 		.color-מאור { background-color: #FFFDE7; color: #212121; } 
 		.color-ניר { background-color: #FF0000; color: #FFFFFF; } 
