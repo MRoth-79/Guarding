@@ -201,12 +201,14 @@
 			direction: ltr !important; /* תיקון הצגת שעות 02:00-06:00 */
 		}
 
-		/* --- הדגשת סוף שבוע (שבת) באפרסק --- */
-		/* יום שבת הוא עמודה 7 (כולל עמודת השעות) */
+		/* --- הדגשת סוף שבוע (שישי ושבת) באפרסק --- */
+		/* עמודה 6 היא שישי, עמודה 7 היא שבת */
+		#schedule-table th:nth-child(6), 
 		#schedule-table th:nth-child(7) {
 			background-color: var(--saturday-peach) !important;
-			color: #212121 !important;
 		}
+
+		#schedule-table td:nth-child(6), 
 		#schedule-table td:nth-child(7) {
 			background-color: var(--saturday-bg) !important;
 		}
@@ -276,7 +278,6 @@
 			font-size: 0 !important;               /* מעלים את הטקסט "נתי" */
 			cursor: help;
 		}
-
 		.color-נתי::before {
 			content: "🐍";                          /* מציג ציור של נחש */
 			font-size: 28px;                       /* קובע את גודל הנחש */
@@ -352,22 +353,42 @@
 		}
 		
 		/* =========================================
-		   8. עיצוב שורת הליווי 07:40 בצהוב נעים
+		   8. עיצוב שורת הליווי 07:40 - אפקט בולט ותלת-ממד
 		   ========================================= */	
 
-		.red-assistance-shift td {
-			background-color: #E1F5FE !important; /* תכלת עדין לכל השבוע כולל יום ראשון */
-			color: #0277BD !important;            /* טקסט כחול כהה */
-			font-weight: bold;
+		/* השורה כולה - מקבלת צל כדי "לצוף" מעל השאר */
+		.red-assistance-shift {
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+			position: relative;
+			z-index: 5;
 		}
 
-		/* החרגת יום שבת בלבד (עמודה 7) - שיישאר אפרסק */
+		/* הגדרות כלליות לתאי השורה (התכלת המוכר) */
+		.red-assistance-shift td {
+			background-color: #E1F5FE !important; 
+			color: #000000 !important;           
+			font-weight: 800 !important;
+			border-top: 3px solid #000000 !important;
+			border-bottom: 3px solid #000000 !important;
+		}
+
+		/* החרגת ימי שישי ושבת (עמודות 6 ו-7) - הופכים לאפרסק עם מסגרת שחורה */
+		#schedule-table tbody tr.red-assistance-shift td:nth-child(6),
 		#schedule-table tbody tr.red-assistance-shift td:nth-child(7) {
 			background-color: var(--saturday-bg) !important;
-			color: #0277BD !important; /* שומר על צבע הטקסט של הליווי */
+			border-top: 3px solid #000000 !important;
+			border-bottom: 3px solid #000000 !important;
 		}
 
-		/* הגנה על עמודת השעות שלא תהפוך לתכלת */
+		/* סגירת המסגרת השחורה בצדדים */
+		.red-assistance-shift td:first-child {
+			border-right: 3px solid #000000 !important;
+		}
+		.red-assistance-shift td:last-child {
+			border-left: 3px solid #000000 !important;
+		}
+
+		/* הגנה על עמודת השעות שלא תאבד את הצבע הכחול שלה */
 		.red-assistance-shift td.time-slot {
 			background-color: var(--secondary-blue) !important;
 			color: white !important;
@@ -416,6 +437,23 @@
 		.date-input-container input[type="date"]:focus {
 			border-color: var(--primary-blue);
 			box-shadow: 0 0 5px rgba(0, 121, 107, 0.15);
+		}
+		
+		/* עיצוב שם היום - שחור ובולט */
+		.day-header-name {
+			color: #000000 !important; /* שחור */
+			display: block;
+			font-weight: bold;
+			font-size: 1.1em;
+		}
+
+		/* עיצוב התאריך - לבן וקטן יותר */
+		.date-text {
+			color: #FFFFFF !important; /* לבן */
+			display: block;
+			font-size: 1.0em;           /* קטן יותר משם היום */
+			font-weight: normal;
+			margin-top: 2px;
 		}
 		
 	</style>
@@ -739,10 +777,20 @@
             // יצירת טבלת הנתונים הראשית
             let scheduleTableHTML = '<table id="schedule-table"><thead><tr><th>שעות / יום</th>';
             
-            // הוספת כותרות הימים כולל התאריכים
-            dayHeaders.forEach((day, index) => { 
-                scheduleTableHTML += `<th>${day}<span class="date-text">${datesForWeek[index]}</span></th>`; 
+			// הוספת כותרות הימים - שם היום בשחור ותאריך לבן וקטן מתחתיו
+            dayHeaders.forEach((day, index) => {
+                // 1. קיצור "יום שני" ל-"שני"
+                const shortDay = day.replace('יום ', '');
+                
+                // 2. בניית תא הכותרת עם הקלאסים המעוצבים
+                scheduleTableHTML += `
+                    <th>
+                        <span class="day-header-name">${shortDay}</span>
+                        <span class="date-text">${datesForWeek[index]}</span>
+                    </th>`;
             });
+
+            // סגירת שורת הכותרת ותחילת גוף הטבלה
             scheduleTableHTML += '</tr></thead><tbody>';
 
             
@@ -893,7 +941,7 @@
                     if (numNames === 0) {
                         if (isAssistanceShift) {
                             cellClass = '';
-                            warningText = '<span class="warning-text" style="color:#00838f;">משבצת ליווי ידנית</span>';
+                            warningText = '';
                         } else {
                             cellClass = 'needs-selection';
                             warningText = '<span class="warning-text">בעיה! משבצת ריקה</span>';
