@@ -9,7 +9,7 @@
 		   1. משתנים גלובליים והגדרות בסיס
 		   ========================================= */
 		:root {
-			--primary-blue: #00796B; 
+			--primary-blue: #004D40; 
 			--secondary-blue: #4DB6AC; 
 			--light-bg-color: #F8FBFB; 
 			--accent-red: #D32F2F; 
@@ -134,10 +134,10 @@
 		.guards-selection-side-panel {
 			flex: 1;
 			background-color: #ffffff;
-			padding: 15px;
-			border-radius: 10px;
-			border: 1px solid var(--border-color);
-			box-shadow: var(--shadow);
+			padding: 20px;
+			border-radius: 15px;
+			border: 1px solid #f0f0f0;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 			position: sticky;
 			top: 20px;
 		}
@@ -159,9 +159,9 @@
 		   ========================================= */
 		#results-container {
 			width: 100%;
-			margin-top: 20px;
+			margin-top: 30px;
 			overflow-x: auto; /* מאפשר גלילה רק אם המסך ממש קטן */
-			padding: 10px;
+			padding: 20px;
 			box-sizing: border-box;
 		}
 
@@ -169,19 +169,23 @@
 			width: 100%;
 			max-width: 1600px;
 			margin: 0 auto !important;
-			border-collapse: collapse;
+			border-collapse: separate;
+			border-spacing: 0;
 			background-color: white;
-			box-shadow: var(--shadow);
-			border-radius: 10px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* צל רך מודרני */
+			border-radius: 15px;
 			overflow: hidden;
-			table-layout: fixed; /* מבטיח חלוקה שווה של העמודות */
+			border: 1px solid #eee;
+			table-layout: fixed; /* מבטיח חלוקה שווה של העמודות */			
 		}
 
 		#schedule-table th, #schedule-table td {
-			border: 1px solid var(--border-color);
-			padding: 12px 8px;
+			border-bottom: 1px solid #f0f0f0;
+			border-left: 1px solid #f0f0f0;
+			padding: 15px 10px;
 			text-align: center;
-			font-size: 18px;
+			font-size: 16px;
+			transition: background-color 0.2s;
 			/* תוספות למניעת קפיצות */
 			height: 70px;            /* קיבוע גובה אחיד לכל התאים */
 			vertical-align: middle;
@@ -196,20 +200,20 @@
 		/* עמודת השעות */
 		.time-slot {
 			background-color: var(--secondary-blue);
-			color: white;
+			color: #475569 !important;
 			font-weight: bold;
 			direction: ltr !important; /* תיקון הצגת שעות 02:00-06:00 */
+			border-left: 2px solid #e2e8f0 !important;
+			width: 110px;
 		}
 
 		/* --- הדגשת סוף שבוע (שישי ושבת) באפרסק --- */
 		/* עמודה 6 היא שישי, עמודה 7 היא שבת */
-		#schedule-table th:nth-child(6), 
-		#schedule-table th:nth-child(7) {
-			background-color: var(--saturday-peach) !important;
+		#schedule-table th:nth-child(6), #schedule-table th:nth-child(7) {
+			background-color: #ff8a65 !important;
 		}
 
-		#schedule-table td:nth-child(6), 
-		#schedule-table td:nth-child(7) {
+		#schedule-table td:nth-child(6), #schedule-table td:nth-child(7) {
 			background-color: var(--saturday-bg) !important;
 		}
 
@@ -222,21 +226,25 @@
 		/* =========================================
 		   5. שמות שומרים (בועות) וצבעים
 		   ========================================= */
+		
 		.person {
 			display: block;
 			width: fit-content;
-			margin: 5px auto;
+			margin: 3px auto;
 			padding: 4px 12px;
-			border-radius: 20px;
+			border-radius: 50px;
 			font-size: 1.1em;
 			font-weight: 600;
-			transition: all 0.2s;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+			cursor: default;
+			border: 1px solid rgba(0,0,0,0.03);
 		}
 
 		.person:hover {
-			transform: scale(1.1);
-			z-index: 10;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+			filter: brightness(1.05);
 		}
 
 		.highlight-name {
@@ -315,19 +323,27 @@
 		#summary-table, #exceptions-table {
 			width: 95%;
 			margin: 30px auto;
-			border-collapse: collapse;
-			box-shadow: var(--shadow);
+			border-collapse: separate;
+			border-spacing: 0;
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 			border-radius: 12px;
 			overflow: hidden;
+			border: 1px solid #f0f0f0;
 		}
 
 		#summary-table thead { background-color: var(--summary-header); color: white; }
-		#exceptions-table thead { background-color: #E65100; color: white; }
+		#exceptions-table thead { background-color: #ef4444; color: white; }
 
-		#summary-table td, #summary-table th, 
-		#exceptions-table td, #exceptions-table th {
-			padding: 14px;
+		#summary-table th, #summary-table td, 
+		#exceptions-table th, #exceptions-table td {
+			padding: 16px;
 			text-align: center;
+			border-bottom: 1px solid #f8fafc;
+			font-size: 15px;
+		}
+		
+		#summary-table tr:last-child td, #exceptions-table tr:last-child td {
+			border-bottom: none;
 		}
 
 		/* סטטוסים בסיכום */
@@ -350,6 +366,37 @@
 				display: block;
 				overflow-x: auto;
 			}
+		}
+		
+		/* כותרת מודרנית לקובץ המורד */
+		.modern-main-header {
+			text-align: center;
+			margin: 30px 0;
+			font-size: 2.5em;
+			font-weight: 800;
+			background: linear-gradient(135deg, var(--primary-blue), #004D40);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			position: relative;
+			display: block;
+			width: fit-content;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		/* פס דקורטיבי מתחת לכותרת */
+		.modern-main-header {
+			text-align: center;
+			margin: 40px auto;
+			padding: 15px 40px;
+			font-size: 2.2em;
+			font-weight: 700;
+			background-color: white;
+			border-radius: 100px; /* עיגול מלא */
+			box-shadow: 0 10px 25px rgba(0,0,0,0.08); /* צל רך מאוד */
+			border: 1px solid #f0f0f0;
+			color: var(--primary-blue);
+			width: fit-content;
 		}
 		
 		/* =========================================
@@ -441,19 +488,82 @@
 		
 		/* עיצוב שם היום - שחור ובולט */
 		.day-header-name {
-			color: #000000 !important; /* שחור */
+			color: #FFFFFF !important; /* לבן בוהק */
 			display: block;
-			font-weight: bold;
-			font-size: 1.1em;
+			font-weight: 700;
+			font-size: 1.5em;
+			text-transform: uppercase;
+			letter-spacing: 1px;
 		}
 
 		/* עיצוב התאריך - לבן וקטן יותר */
 		.date-text {
 			color: #FFFFFF !important; /* לבן */
 			display: block;
-			font-size: 1.0em;           /* קטן יותר משם היום */
+			font-size: 1.2em;           /* קטן יותר משם היום */
 			font-weight: normal;
 			margin-top: 2px;
+		}
+
+		/* הסתרת הודעת קישור כברירת מחדל */
+		#link-message { display: none; }
+
+		/* מחלקות מצב שחסרו */
+		.needs-selection { background: #ffebee !important; color:#b71c1c !important; font-weight:700; }
+		.ok-shift { background: #ffffff; }
+		.night-shift-ok { background: #f3f7ff; }
+		.warning-text { color:#d32f2f; font-weight:700; }
+		.night-limit-ok { color:#1b5e20; font-weight:700; }
+		.night-limit-fail { color:#b71c1c; font-weight:700; }
+		.night-limit-fail-row { background:#ffebee; }
+
+		/* עיצוב שורת חיפוש שומרים */
+		#guardSearch {
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 12px;
+			border: 1px solid var(--border-color);
+			border-radius: 20px;
+			font-size: 14px;
+			outline: none;
+		}
+		
+		/* מניעת סימון טקסט בבועות השומרים */
+		.person {
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
+		/* אפקט לחיצה על כפתורים */
+		button:active {
+			transform: scale(0.96) !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+		}
+
+		/* שיפור מראה תיבת הטקסט */
+		textarea:focus {
+			outline: none;
+			border-color: var(--secondary-blue);
+			box-shadow: 0 0 0 3px rgba(77, 182, 172, 0.1);
+		}
+		
+		/* =========================================
+		   אנימציית דגל מתנפנף
+		   ========================================= */
+		@keyframes wave-flag {
+			0% { transform: perspective(100px) rotateY(0deg) skewY(0deg); }
+			25% { transform: perspective(100px) rotateY(15deg) skewY(2deg); }
+			50% { transform: perspective(100px) rotateY(0deg) skewY(0deg); }
+			75% { transform: perspective(100px) rotateY(-15deg) skewY(-2deg); }
+			100% { transform: perspective(100px) rotateY(0deg) skewY(0deg); }
+		}
+
+		.waving-flag {
+			display: inline-block;
+			/* הפעלת האנימציה: שם הריקוד, משך זמן, אינסופי, לינארי */
+			animation: wave-flag 2.5s infinite ease-in-out;
+			transform-origin: left center; /* הדגל "מחובר" לתורן בצד שמאל */
+			filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); /* צל עמוק יותר */
 		}
 		
 	</style>
@@ -488,7 +598,7 @@
 			<p id="fetch-status" style="text-align: center; display: none; font-weight: bold; margin-top: 10px;"></p>
             
             <div class="date-input-container">
-                <label for="startDate">תאריך יום ראשון:</label>
+                <label for="startDate">תאריך יום שני (תחילת שבוע):</label>
                 <input type="date" id="startDate" required>
             </div>
             
@@ -614,40 +724,7 @@
 			}
 			
 			if (typeof generateGuardsButtons === "function") generateGuardsButtons();
-			if (typeof generateHolidayChecklist === "function") generateHolidayChecklist(); 
 		}
-
-/**
- * פונקציה חדשה: יצירת צ'קליסט ימי חופש (לביטול ליווי) - *** עם תיקון רוחב אחיד ***
- */
-		function generateHolidayChecklist() {
-			const container = document.getElementById('holidayChecklist');
-			if (!container) return;
-
-			let html = '';
-			// Use the existing EXPECTED_DAYS constant
-			EXPECTED_DAYS.forEach((day, index) => {
-				const checkId = `check-holiday-${index}`;
-				// יום שבת (index 5) מושבת כברירת מחדל
-				const isDisabled = (index === 5); 
-				
-				// --- התיקון כאן ---
-				// 1. קבענו 'width: 120px' (במקום min-width) לרוחב אחיד
-				// 2. ה-label (טקסט) מופיע לפני ה-input (תיבה) ליישור לימין (RTL)
-				// 3. 'justify-content: space-between' מיישר את הטקסט לימין ואת התיבה לשמאל
-				
-				html += `
-					<div style="display: flex; align-items: center; justify-content: space-between; width: 120px; box-sizing: border-box;">
-						<label for="${checkId}" style="font-size: 15px; cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; color: ${isDisabled ? '#757575' : 'inherit'};">
-							${day}
-						</label>
-						<input type="checkbox" id="${checkId}" name="holidayDay" value="${index}" style="transform: scale(1.2);" ${isDisabled ? 'checked disabled' : ''}>
-					</div>
-				`;
-			});
-			container.innerHTML = html;
-		}
-
 
         /**
          * פונקציה שמקבלת תאריך התחלה ומחזירה מערך תאריכים לשבוע.
@@ -973,9 +1050,14 @@
                         return `<span class="person ${className}" title="${name} - ${day}, ${timeSlotDisplay}">${name}</span>`;
                     }).join('');
 
-                    scheduleTableHTML += `<td data-day="${day}" data-time="${timeSlotDisplay}" class="${cellClass}">
-                        ${formattedNames} ${warningText}
-                    </td>`;
+					// בדיקה האם זו משמרת ליווי וגם יום שבת
+					const isSaturdayAssistance = isAssistanceShift && day.includes('שבת');
+					// הוספנו את ה-class "waving-flag" והגדלנו את הפונט משמעותית ל-3em
+					const flag = isSaturdayAssistance ? '<span class="waving-flag" style="font-size: 3em; margin-left: 15px;">🇮🇱</span>' : '';
+
+					scheduleTableHTML += `<td data-day="${day}" data-time="${timeSlotDisplay}" class="${cellClass}">
+						${flag}${formattedNames} ${warningText}
+					</td>`;
                 });
                 scheduleTableHTML += '</tr>';
             });
@@ -1177,7 +1259,7 @@
                     </style>
                 </head>
                 <body>
-                    <h2 style="text-align: center; text-decoration: underline; color: #00796B;">${dynamicHeader}</h2>
+                    <h1 class="modern-main-header">${dynamicHeader}</h1>
                     <div id="results-container">${lastRenderedTableHTML}</div>
                     <script>${highlightScript}<\/script>
                 </body>
@@ -1210,13 +1292,6 @@
 			
 			// המשתנה מוגדר כסט ריק כדי למנוע שגיאות בהמשך הקוד.
             const excludedGuardsSet = new Set();
-
-			// **חדש: קריאת ימים שבהם הליווי מבוטל**
-            const holidaySet = new Set();
-            const holidayCheckboxes = document.querySelectorAll('#holidayChecklist input[type="checkbox"]:checked');
-            holidayCheckboxes.forEach(cb => {
-                holidaySet.add(parseInt(cb.value, 10)); // cb.value הוא אינדקס היום (0-6)
-            });
 
             const initialParsedData = parseVerticalText(textContent);
 
@@ -1278,15 +1353,11 @@
 						let namesInSlot = []; 
 
 						if (iteration === 0) {
-							const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
 
-							if (isAssistanceShift) {
-								// 🛑 עבור ליווי: שומרים את כל השמות שהוזנו ידנית (בלי בדיקת כמות), אלא אם חסום
-								namesInSlot = availableNames.filter(name => allEmployees.includes(name)); 
-								if (isBlockedAssistance) {
-									namesInSlot = []; // מנקה משמרת ליווי ביום חופש מסומן
-								}
-							} else {
+						if (isAssistanceShift) {
+							// שומרים את מי ששובץ ידנית בליווי כדי שהרובוט ידע שהם תפוסים ולא ישבץ אותם שוב באותו יום
+							namesInSlot = availableNames.filter(name => allEmployees.includes(name)); 
+						} else {
 								// 🛑 עבור משמרות רגילות: שומרים שיבוץ ידני רק אם הכמות תקינה
 								if (availableNames.length === required && availableNames.length > 0) {
 									namesInSlot = availableNames; // שומר שיבוץ ידני תקין
@@ -1336,14 +1407,14 @@
                             }
                         });
 
-						// אם המשבצת דורשת מילוי אוטומטי (כולל ליווי, לא כולל שבת)
-						// התנאי מונע שיבוץ רק אם זו משמרת ליווי בשבת
-						// **תיקון: מונע שיבוץ ליווי ביום חופש מסומן (כולל שבת)**
-                        const isBlockedAssistance = isAssistanceShift && holidaySet.has(dayIndex);
 
-						// התנאי החדש: המשבצת לא חסומה AND זו לא משמרת ליווי AND היא לא מלאה
-						if ( !isBlockedAssistance && !isAssistanceShift && newScheduleData[shiftIndex][dayIndex].length < required) {
-							shiftsToFill.push({ dayIndex, shiftIndex, requiredCount: required - newScheduleData[shiftIndex][dayIndex].length });
+						// הרובוט ימלא משמרת רק אם היא לא משמרת ליווי (Assist) והיא לא מלאה
+						if (!isAssistanceShift && newScheduleData[shiftIndex][dayIndex].length < required) {
+							shiftsToFill.push({ 
+								dayIndex, 
+								shiftIndex, 
+								requiredCount: required - newScheduleData[shiftIndex][dayIndex].length 
+							});
 						}
                     });
                     if (mustStop) return;
