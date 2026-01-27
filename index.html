@@ -176,7 +176,7 @@
 			border-radius: 15px;
 			overflow: hidden;
 			border: 1px solid #eee;
-			table-layout: fixed; /* מבטיח חלוקה שווה של העמודות */			
+			table-layout: fixed !important;
 		}
 
 		#schedule-table th, #schedule-table td {
@@ -204,7 +204,6 @@
 			font-weight: bold;
 			direction: ltr !important; /* תיקון הצגת שעות 02:00-06:00 */
 			border-left: 2px solid #e2e8f0 !important;
-			width: 110px;
 		}
 
 		/* --- הדגשת סוף שבוע (שישי ושבת) באפרסק --- */
@@ -233,7 +232,7 @@
 			margin: 3px auto;
 			padding: 4px 12px;
 			border-radius: 50px;
-			font-size: 1.6em;
+			font-size: 1.5em;
 			font-weight: 600;
 			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
