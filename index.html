@@ -458,7 +458,7 @@
 		
 	</style>
 </head>
-<body onload="initializeData(); document.getElementById('analyzeButton').click();">
+<body>
 
 <div class="container">
     <h2>מנתח טבלת משמרות שבועית 📅</h2>
@@ -488,7 +488,7 @@
 			<p id="fetch-status" style="text-align: center; display: none; font-weight: bold; margin-top: 10px;"></p>
             
             <div class="date-input-container">
-                <label for="startDate">תאריך יום ראשון:</label>
+                <label for="startDate">תאריך יום שני (תחילת שבוע):</label>
                 <input type="date" id="startDate" required>
             </div>
             
@@ -1765,7 +1765,13 @@
                 lockedName = null;
                 updateHighlights(null);
             }
-        });
+		
+		document.addEventListener('DOMContentLoaded', () => {
+		  initializeData();
+		  const analyzeBtn = document.getElementById('analyzeButton');
+		  if (analyzeBtn) analyzeBtn.click();
+		});
+
     </script>
 </body>
 </html>
